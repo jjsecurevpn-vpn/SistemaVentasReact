@@ -25,7 +25,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchUserRoles = async (userId: string) => {
-    console.log('fetchUserRoles called for userId:', userId);
     // Temporary: hardcode admin for testing
     if (userId === 'd336435a-9cfe-4eaf-b6aa-cbb4301c6c95') {
       return ['admin'];

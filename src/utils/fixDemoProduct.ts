@@ -2,8 +2,6 @@ import { supabase } from '../lib/supabase';
 
 export const fixDemoProductPrice = async () => {
   try {
-    console.log('Actualizando precio del producto Demo...');
-
     const { data, error } = await supabase
       .from('productos')
       .update({ precio: 100.00 })
@@ -15,7 +13,6 @@ export const fixDemoProductPrice = async () => {
       throw error;
     }
 
-    console.log('Producto actualizado exitosamente:', data);
     return data;
   } catch (error) {
     console.error('Error en fixDemoProductPrice:', error);

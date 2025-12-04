@@ -46,6 +46,9 @@ const TopProducts: React.FC<TopProductsProps> = ({ productosVendidos, formatCurr
                 </div>
                 <div className="text-right ml-3 sm:ml-4 flex-shrink-0">
                   <p className="text-green-400 font-semibold truncate">{formatCurrency(producto.total_ingresos)}</p>
+                  <p className="text-xs text-emerald-400 mt-0.5">
+                    Ganancia: {formatCurrency(producto.ganancia)}
+                  </p>
                 </div>
               </div>
             </div>

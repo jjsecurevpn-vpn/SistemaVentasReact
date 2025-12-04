@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "../lib/supabase";
 import { useRealtimeSubscription } from "./useRealtimeSubscription";
+import { getMonthRange, getTodayString, getLocalDateString } from "./useDateUtils";
 
 export interface DashboardStats {
   total_productos: number;
@@ -11,14 +12,18 @@ export interface DashboardStats {
   gastos_mes: number;
   dinero_fiado_pendiente: number;
   dinero_disponible: number;
+  ganancia_hoy: number;
+  ganancia_mes: number;
 }
 
 export interface ProductoVendido {
   id: number;
   nombre: string;
   precio: number;
+  precio_compra: number;
   total_vendido: number;
   total_ingresos: number;
+  ganancia: number;
 }
 
 export interface ClienteTop {
@@ -48,37 +53,22 @@ export const useDashboard = (mes?: number, año?: number) => {
       const mesActual = mes ?? now.getMonth() + 1;
       const añoActual = año ?? now.getFullYear();
 
-      // Calcular rango de fechas
-      const fechaInicio = new Date(añoActual, mesActual - 1, 1);
-      const fechaFin = new Date(añoActual, mesActual, 0, 23, 59, 59);
-
-      const fechaInicioISO = fechaInicio.toISOString().split('T')[0];
-      const fechaFinISO = fechaFin.toISOString().split('T')[0];
-      const hoyISO = new Date().toISOString().split('T')[0];
+      // Usar hook centralizado para manejo de fechas
+      const { start: fechaInicioISO, end: fechaFinISO } = getMonthRange(añoActual, mesActual);
+      const hoyISO = getTodayString();
 
       // Ejecutar todas las queries principales en paralelo
+      // NOTA: Traemos todos los movimientos y filtramos en cliente para manejar correctamente timezone
       const [
         { data: todosMovimientos, error: todosMovError },
-        { data: ventasHoyData },
         { data: fiadoData },
         { data: productosData },
         { data: clientesData },
-        { data: ventasDelMes, error: ventasDelMesError },
-        { data: todosMovimientosTotal }
       ] = await Promise.all([
-        // Movimientos del mes
+        // TODOS los movimientos con fecha para filtrar en cliente
         supabase
           .from("movimientos_caja")
-          .select("monto, tipo")
-          .gte("fecha", `${fechaInicioISO}T00:00:00`)
-          .lte("fecha", `${fechaFinISO}T23:59:59`),
-        // Ventas de hoy
-        supabase
-          .from("movimientos_caja")
-          .select("monto")
-          .in("tipo", ["ingreso", "pago_fiado"])
-          .gte("fecha", `${hoyISO}T00:00:00`)
-          .lte("fecha", `${hoyISO}T23:59:59`),
+          .select("monto, tipo, fecha, venta_id"),
         // Dinero fiado pendiente
         supabase
           .from("ventas_fiadas")
@@ -92,35 +82,34 @@ export const useDashboard = (mes?: number, año?: number) => {
         supabase
           .from("clientes")
           .select("id", { count: "exact" }),
-        // Ventas del mes (una sola query)
-        supabase
-          .from("ventas")
-          .select("id")
-          .gte("fecha", `${fechaInicioISO}T00:00:00`)
-          .lte("fecha", `${fechaFinISO}T23:59:59`),
-        // TODOS los movimientos para dinero disponible total
-        supabase
-          .from("movimientos_caja")
-          .select("monto, tipo")
       ]);
 
       if (todosMovError) throw todosMovError;
-      if (ventasDelMesError) throw ventasDelMesError;
+
+      // Filtrar movimientos por fecha LOCAL (Argentina)
+      const movimientosDelMes = (todosMovimientos || []).filter(m => {
+        const fechaLocal = getLocalDateString(m.fecha);
+        return fechaLocal >= fechaInicioISO && fechaLocal <= fechaFinISO;
+      });
+
+      const movimientosDeHoy = (todosMovimientos || []).filter(m => {
+        const fechaLocal = getLocalDateString(m.fecha);
+        return fechaLocal === hoyISO;
+      });
 
       // Calcular ingresos, gastos y ventas del mes
-      const ingresosMes = (todosMovimientos || [])
+      const ingresosMes = movimientosDelMes
         .filter(m => m.tipo === 'ingreso' || m.tipo === 'pago_fiado')
         .reduce((sum, m) => sum + (m.monto || 0), 0);
 
-      const gastosMes = (todosMovimientos || [])
+      const gastosMes = movimientosDelMes
         .filter(m => m.tipo === 'gasto')
         .reduce((sum, m) => sum + (m.monto || 0), 0);
 
-      // Ventas hoy
-      let ventasHoy = 0;
-      if (ventasHoyData) {
-        ventasHoy = ventasHoyData.reduce((sum, v) => sum + (v.monto || 0), 0);
-      }
+      // Ventas hoy (monto en caja)
+      const ventasHoyMonto = movimientosDeHoy
+        .filter(m => m.tipo === 'ingreso' || m.tipo === 'pago_fiado')
+        .reduce((sum, m) => sum + (m.monto || 0), 0);
 
       // Dinero fiado pendiente
       let dineroFiadoPendiente = 0;
@@ -131,29 +120,38 @@ export const useDashboard = (mes?: number, año?: number) => {
       }
 
       // Dinero disponible: calcular a partir de todos los movimientos
-      let dineroDisponibleTotal = 0;
-      if (todosMovimientosTotal) {
-        dineroDisponibleTotal = todosMovimientosTotal.reduce((sum, m) => {
-          if (m.tipo === 'ingreso' || m.tipo === 'pago_fiado') {
-            return sum + (m.monto || 0);
-          } else if (m.tipo === 'gasto') {
-            return sum - (m.monto || 0);
-          }
-          return sum;
-        }, 0);
-      }
+      const dineroDisponibleTotal = (todosMovimientos || []).reduce((sum, m) => {
+        if (m.tipo === 'ingreso' || m.tipo === 'pago_fiado') {
+          return sum + (m.monto || 0);
+        } else if (m.tipo === 'gasto') {
+          return sum - (m.monto || 0);
+        }
+        return sum;
+      }, 0);
 
-      // Procesar productos más vendidos si hay ventas en el mes
-      let productosVendidosFinal: ProductoVendido[] = [];
+      // Obtener IDs de ventas pagadas del mes (filtrado por fecha local)
+      const movimientosIngresoMes = movimientosDelMes
+        .filter(m => m.tipo === 'ingreso' && m.venta_id);
       
-      if (ventasDelMes && ventasDelMes.length > 0) {
-        const ventasIds = ventasDelMes.map(v => v.id);
+      const movimientosIngresoHoy = movimientosDeHoy
+        .filter(m => m.tipo === 'ingreso' && m.venta_id);
 
-        // Obtener productos vendidos con JOIN para evitar múltiples queries
+      // Procesar productos más vendidos si hay ventas PAGADAS en el mes
+      // Solo contamos ventas que impactaron la caja (tipo 'ingreso')
+      let productosVendidosFinal: ProductoVendido[] = [];
+      let gananciaMes = 0;
+      
+      // Obtener IDs de ventas pagadas del mes (ya filtrado por fecha local)
+      const ventasIdsDelMes = movimientosIngresoMes.map(m => m.venta_id);
+      
+      if (ventasIdsDelMes.length > 0) {
+        // Obtener productos vendidos con precios históricos guardados en venta_productos
+        // Usamos precio_unitario y precio_compra de venta_productos (precio al momento de la venta)
+        // Si no existen (ventas antiguas), fallback a los precios actuales del producto
         const { data: productosVendidosData, error: productosVendidosError } = await supabase
           .from("venta_productos")
-          .select("producto_id, cantidad, subtotal, productos(id, nombre, precio)")
-          .in("venta_id", ventasIds);
+          .select("producto_id, cantidad, subtotal, precio_unitario, precio_compra, productos(id, nombre, precio, precio_compra)")
+          .in("venta_id", ventasIdsDelMes);
 
         if (productosVendidosError) throw productosVendidosError;
 
@@ -163,95 +161,138 @@ export const useDashboard = (mes?: number, año?: number) => {
           for (const item of productosVendidosData) {
             const productoId = item.producto_id;
             const producto = Array.isArray(item.productos) ? item.productos[0] : item.productos;
+            
+            // Usar precios históricos de venta_productos, fallback a precios actuales del producto
+            const precioVentaHistorico = item.precio_unitario ?? producto?.precio ?? 0;
+            const precioCompraHistorico = item.precio_compra ?? producto?.precio_compra ?? 0;
+            
             if (!productosMap.has(productoId)) {
               productosMap.set(productoId, {
                 cantidad: 0,
                 subtotal: 0,
+                costoTotal: 0, // Acumular costo usando precios históricos
                 nombre: producto?.nombre,
-                precio: producto?.precio
+                precio: precioVentaHistorico,
+                precio_compra: precioCompraHistorico
               });
             }
             const current = productosMap.get(productoId);
             current.cantidad += item.cantidad || 0;
             current.subtotal += item.subtotal || 0;
+            // Calcular costo usando el precio_compra histórico de cada venta
+            current.costoTotal += (precioCompraHistorico * (item.cantidad || 0));
+        }
+        }
+
+        // Convertir a array y calcular ganancia usando costoTotal acumulado (precios históricos)
+        productosVendidosFinal = Array.from(productosMap.entries())
+          .map(([id, data]) => {
+            // Ganancia = ingresos - costo total (usando precios históricos)
+            const gananciaProducto = data.subtotal - data.costoTotal;
+            return {
+              id,
+              nombre: data.nombre,
+              precio: data.precio,
+              precio_compra: data.precio_compra,
+              total_vendido: data.cantidad,
+              total_ingresos: data.subtotal,
+              ganancia: gananciaProducto,
+            };
+          })
+          .sort((a, b) => b.total_vendido - a.total_vendido)
+          .slice(0, 10);
+
+        // Calcular ganancia total del mes usando costos históricos acumulados
+        gananciaMes = Array.from(productosMap.values()).reduce((sum, data) => {
+          return sum + (data.subtotal - data.costoTotal);
+        }, 0);
+      }
+
+      // Calcular ganancia de hoy (solo de ventas PAGADAS hoy)
+      let gananciaHoy = 0;
+      const ventasIdsHoy = movimientosIngresoHoy.map(m => m.venta_id);
+      
+      if (ventasIdsHoy.length > 0) {
+        // Usar precios históricos de venta_productos para ganancia del día
+        const { data: productosHoyData } = await supabase
+          .from("venta_productos")
+          .select("cantidad, subtotal, precio_compra, productos(precio_compra)")
+          .in("venta_id", ventasIdsHoy);
+
+        if (productosHoyData) {
+          gananciaHoy = productosHoyData.reduce((sum, item) => {
+            const producto = Array.isArray(item.productos) ? item.productos[0] : item.productos;
+            // Usar precio_compra histórico de venta_productos, fallback al precio actual
+            const precioCompra = item.precio_compra ?? producto?.precio_compra ?? 0;
+            const costoItem = precioCompra * (item.cantidad || 0);
+            return sum + ((item.subtotal || 0) - costoItem);
+          }, 0);
+        }
+      }
+
+      // Procesar clientes top (basado en ventas fiadas del mes)
+      // Obtenemos las ventas fiadas que se realizaron en el mes seleccionado
+      let clientesTopFinal: ClienteTop[] = [];
+      
+      // Obtener ventas fiadas del mes
+      const { data: ventasFiadasMes, error: ventasFiadasMesError } = await supabase
+        .from("ventas_fiadas")
+        .select("cliente_id, venta_id, ventas(id, total, fecha), clientes(id, nombre, apellido, email)")
+        .gte("ventas.fecha", `${fechaInicioISO}T00:00:00`)
+        .lte("ventas.fecha", `${fechaFinISO}T23:59:59`);
+
+      if (ventasFiadasMesError) throw ventasFiadasMesError;
+
+      if (ventasFiadasMes && ventasFiadasMes.length > 0) {
+        const clientesMap = new Map<number, any>();
+        
+        for (const item of ventasFiadasMes) {
+          const venta = Array.isArray(item.ventas) ? item.ventas[0] : item.ventas;
+          const cliente = Array.isArray(item.clientes) ? item.clientes[0] : item.clientes;
+          const clienteId = item.cliente_id;
+          
+          // Solo procesar si la venta tiene datos (el filtro de fecha puede dejar algunos null)
+          if (venta && venta.total && cliente) {
+            if (!clientesMap.has(clienteId)) {
+              clientesMap.set(clienteId, {
+                total: 0,
+                compras: 0,
+                nombre: cliente?.nombre,
+                apellido: cliente?.apellido,
+                email: cliente?.email
+              });
+            }
+            const current = clientesMap.get(clienteId);
+            current.total += venta.total || 0;
+            current.compras += 1;
           }
         }
 
         // Convertir a array y ordenar
-        productosVendidosFinal = Array.from(productosMap.entries())
+        clientesTopFinal = Array.from(clientesMap.entries())
           .map(([id, data]) => ({
             id,
             nombre: data.nombre,
-            precio: data.precio,
-            total_vendido: data.cantidad,
-            total_ingresos: data.subtotal,
+            apellido: data.apellido,
+            email: data.email,
+            total_compras_fiadas: data.compras,
+            total_comprado: data.total,
           }))
-          .sort((a, b) => b.total_vendido - a.total_vendido)
+          .sort((a, b) => b.total_comprado - a.total_comprado)
           .slice(0, 10);
-      }
-
-      // Procesar clientes top
-      let clientesTopFinal: ClienteTop[] = [];
-      
-      if (ventasDelMes && ventasDelMes.length > 0) {
-        const ventasIds = ventasDelMes.map(v => v.id);
-        
-        // Obtener ventas fiadas con JOIN para evitar múltiples queries
-        const { data: ventasConClientes, error: ventasConClientesError } = await supabase
-          .from("ventas_fiadas")
-          .select("cliente_id, ventas(total), clientes(id, nombre, apellido, email)")
-          .in("venta_id", ventasIds);
-
-        if (ventasConClientesError) throw ventasConClientesError;
-
-        if (ventasConClientes && ventasConClientes.length > 0) {
-          const clientesMap = new Map<number, any>();
-          
-          for (const item of ventasConClientes) {
-            const venta = Array.isArray(item.ventas) ? item.ventas[0] : item.ventas;
-            const cliente = Array.isArray(item.clientes) ? item.clientes[0] : item.clientes;
-            const clienteId = item.cliente_id;
-            
-            if (venta && venta.total) {
-              if (!clientesMap.has(clienteId)) {
-                clientesMap.set(clienteId, {
-                  total: 0,
-                  compras: 0,
-                  nombre: cliente?.nombre,
-                  apellido: cliente?.apellido,
-                  email: cliente?.email
-                });
-              }
-              const current = clientesMap.get(clienteId);
-              current.total += venta.total || 0;
-              current.compras += 1;
-            }
-          }
-
-          // Convertir a array y ordenar
-          clientesTopFinal = Array.from(clientesMap.entries())
-            .map(([id, data]) => ({
-              id,
-              nombre: data.nombre,
-              apellido: data.apellido,
-              email: data.email,
-              total_compras_fiadas: data.compras,
-              total_comprado: data.total,
-            }))
-            .sort((a, b) => b.total_comprado - a.total_comprado)
-            .slice(0, 10);
-        }
       }
 
       setStats({
         total_productos: productosData?.length || 0,
         total_clientes: clientesData?.length || 0,
-        ventas_hoy: ventasHoy,
+        ventas_hoy: ventasHoyMonto,
         ventas_mes: ingresosMes,
         ingresos_mes: ingresosMes,
         gastos_mes: gastosMes,
         dinero_fiado_pendiente: dineroFiadoPendiente,
         dinero_disponible: dineroDisponibleTotal,
+        ganancia_hoy: gananciaHoy,
+        ganancia_mes: gananciaMes,
       });
       setProductosVendidos(productosVendidosFinal);
       setClientesTop(clientesTopFinal);

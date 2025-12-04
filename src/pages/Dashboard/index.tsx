@@ -36,22 +36,13 @@ const Dashboard: React.FC = () => {
     const fixDemoPrice = async () => {
       try {
         await fixDemoProductPrice();
-      } catch (error) {
-        console.error('Error al corregir precio del producto Demo:', error);
+      } catch {
+        // ignore background fix errors
       }
     };
 
     fixDemoPrice();
   }, []);
-
-  const handleFixDemoPrice = async () => {
-    try {
-      await fixDemoProductPrice();
-      alert('Precio del producto Demo actualizado exitosamente. Recarga la página para ver los cambios.');
-    } catch (error) {
-      alert('Error al actualizar el precio: ' + error);
-    }
-  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-ES', {
@@ -117,7 +108,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#181818] overflow-x-hidden w-full">
       <div className="px-4 py-6 sm:px-6 md:px-8 md:py-8 lg:max-w-7xl xl:max-w-[1800px] mx-auto max-w-full overflow-x-hidden w-full box-border">
-        <DashboardHeader currentTime={currentTime} onFixDemoPrice={handleFixDemoPrice} />
+        <DashboardHeader currentTime={currentTime} />
 
         <MonthSelector
           mes={mes}

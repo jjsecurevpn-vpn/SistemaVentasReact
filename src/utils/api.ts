@@ -4,6 +4,7 @@ export interface Product {
   id: number;
   nombre: string;
   precio: number;
+  precio_compra?: number;
   stock: number;
   descripcion?: string;
   notas?: string;
@@ -22,6 +23,8 @@ export interface SaleProduct {
   producto_id: number;
   cantidad: number;
   subtotal: number;
+  precio_unitario?: number; // Precio de venta al momento de la transacción
+  precio_compra?: number;   // Costo al momento de la transacción
 }
 
 // Productos

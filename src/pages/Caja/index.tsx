@@ -3,12 +3,14 @@ import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
 import { useNotification } from '../../hooks/useNotification';
 import { useRealtimeSubscription } from '../../hooks/useRealtimeSubscription';
+import { getLocalDateString, getMonthRange } from '../../hooks/useDateUtils';
 import CajaHeader from './CajaHeader';
 import CajaStats from './CajaStats';
 import CajaFilters from './CajaFilters';
 import CajaMovementsList from './CajaMovementsList';
 import CajaMovementForm from './CajaMovementForm';
 import CajaDeleteModal from './CajaDeleteModal';
+import CajaMovementDetailsModal from './CajaMovementDetailsModal';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
 interface Movimiento {
@@ -20,6 +22,8 @@ interface Movimiento {
   usuario_id: string;
   venta_id?: number;
   cliente_id?: number;
+  metodo_pago?: string;
+  notas?: string;
   usuario?: {
     id: string;
     email: string;
@@ -125,6 +129,7 @@ const Caja: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingMovement, setDeletingMovement] = useState<Movimiento | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [detailMovement, setDetailMovement] = useState<Movimiento | null>(null);
 
   // Detectar si es móvil
   useEffect(() => {
@@ -141,8 +146,6 @@ const Caja: React.FC = () => {
   const loadMovimientos = async () => {
     try {
       setLoading(true);
-      console.log('Loading movimientos from movimientos_caja_con_usuario...');
-      
       const { data, error } = await supabase
         .from('movimientos_caja_con_usuario')
         .select('*')
@@ -194,14 +197,20 @@ const Caja: React.FC = () => {
           usuario_id: movimiento.usuario_id,
           venta_id: movimiento.venta_id,
           cliente_id: movimiento.cliente_id,
+          metodo_pago: movimiento.metodo_pago || movimiento.metodoPago,
+          notas: movimiento.notas,
           created_at: movimiento.fecha
         };
 
         // El usuario viene como JSON de la vista
-        if (movimiento.usuario && typeof movimiento.usuario === 'object') {
+        let usuarioData = movimiento.usuario;
+        if (Array.isArray(usuarioData)) {
+          usuarioData = usuarioData[0];
+        }
+        if (usuarioData && typeof usuarioData === 'object') {
           movimientoEnriquecido.usuario = {
-            id: movimiento.usuario.id,
-            email: movimiento.usuario.email || ''
+            id: usuarioData.id,
+            email: usuarioData.email || ''
           };
         }
 
@@ -232,11 +241,6 @@ const Caja: React.FC = () => {
         return movimientoEnriquecido;
       });
 
-      console.log('Movimientos loaded:', movimientosEnriquecidos.length, 'records');
-      if (movimientosEnriquecidos.length > 0) {
-        console.log('Sample movimiento:', movimientosEnriquecidos[0]);
-      }
-
       setMovimientos(movimientosEnriquecidos);
     } catch (error) {
       console.error('Error loading movimientos:', error);
@@ -249,7 +253,6 @@ const Caja: React.FC = () => {
   // Cargar deudas pendientes
   const loadDeudasPendientes = async () => {
     try {
-      console.log('Loading deudas pendientes...');
       // Obtener todas las ventas_fiadas que aún tienen saldo pendiente
       const { data: ventasFiadas, error: ventasFiadasError } = await supabase
         .from('ventas_fiadas')
@@ -320,7 +323,6 @@ const Caja: React.FC = () => {
         };
       });
 
-      console.log('Deudas pendientes loaded:', deudas.length, 'records');
       setDeudasPendientes(deudas);
     } catch (error) {
       console.error('Error loading deudas pendientes:', error);
@@ -343,14 +345,7 @@ const Caja: React.FC = () => {
     []
   );
 
-  useRealtimeSubscription("caja-realtime", cajaSubscriptions, (payload) => {
-    console.log('🔄 Realtime update received in Caja:', payload);
-    console.log('Payload details:', {
-      eventType: payload.eventType,
-      table: payload.table,
-      new: payload.new,
-      old: payload.old
-    });
+  useRealtimeSubscription("caja-realtime", cajaSubscriptions, (_payload) => {
     loadMovimientos();
     loadDeudasPendientes();
   });
@@ -358,16 +353,13 @@ const Caja: React.FC = () => {
   // Listener para evento personalizado de recarga
   useEffect(() => {
     const handleReloadEvent = () => {
-      console.log('🔄 Recarga forzada de movimientos desde evento personalizado');
       loadMovimientos();
       loadDeudasPendientes();
     };
 
-    const handlePagoRegistrado = (event: CustomEvent) => {
-      console.log('💰 Pago registrado detectado:', event.detail);
+    const handlePagoRegistrado = (_event: CustomEvent) => {
       // Pequeño delay para asegurar que la transacción se complete
       setTimeout(() => {
-        console.log('🔄 Recargando movimientos después de pago registrado');
         loadMovimientos();
         loadDeudasPendientes();
       }, 500);
@@ -384,16 +376,11 @@ const Caja: React.FC = () => {
 
   // Calcular estadísticas
   const stats = useMemo(() => {
-    // Filtrar movimientos por mes y año SOLO para el mes seleccionado
-    // Usar el mismo método de comparación que Dashboard para consistencia
-    const fechaInicio = new Date(año, mes - 1, 1);
-    const fechaFin = new Date(año, mes, 0, 23, 59, 59);
-    
-    const fechaInicioISO = fechaInicio.toISOString().split('T')[0];
-    const fechaFinISO = fechaFin.toISOString().split('T')[0];
+    // Filtrar movimientos por mes y año usando el hook centralizado
+    const { start: fechaInicioISO, end: fechaFinISO } = getMonthRange(año, mes);
 
     const movimientosMes = movimientos.filter(movimiento => {
-      const fechaStr = movimiento.fecha.split('T')[0]; // Obtener solo la fecha sin hora
+      const fechaStr = getLocalDateString(movimiento.fecha);
       return fechaStr >= fechaInicioISO && fechaStr <= fechaFinISO;
     });
 
@@ -444,10 +431,12 @@ const Caja: React.FC = () => {
   // Procesar movimientos filtrados con información adicional
   useEffect(() => {
     const processMovimientos = async () => {
-      // Filtrar movimientos por mes/año primero
+      // Filtrar movimientos por mes/año usando el hook centralizado
+      const { start: fechaInicioStr, end: fechaFinStr } = getMonthRange(año, mes);
+      
       let movimientosPorMes = movimientos.filter(movimiento => {
-        const fechaMovimiento = new Date(movimiento.fecha);
-        return fechaMovimiento.getMonth() + 1 === mes && fechaMovimiento.getFullYear() === año;
+        const fechaStr = getLocalDateString(movimiento.fecha);
+        return fechaStr >= fechaInicioStr && fechaStr <= fechaFinStr;
       });
 
       // Luego aplicar filtros adicionales
@@ -566,10 +555,7 @@ const Caja: React.FC = () => {
       // Obtener clientes únicos
       const clienteIdsArray = Array.from(new Set(ventasFiadasData.data?.map(vf => vf.cliente_id) || []));
       
-      // Obtener usuarios únicos que registraron movimientos
-      const usuarioIdsArray = Array.from(new Set(filtered.map(m => m.usuario_id).filter((id): id is string => id !== undefined && id !== null)));
-      
-      const [clientesInfo, productosInfo, usuariosInfo] = await Promise.all([
+      const [clientesInfo, productosInfo] = await Promise.all([
         clienteIdsArray.length > 0 ? supabase
           .from('clientes')
           .select('id, nombre, apellido, email')
@@ -578,17 +564,17 @@ const Caja: React.FC = () => {
         Array.from(productoIds).length > 0 ? supabase
           .from('productos')
           .select('id, nombre')
-          .in('id', Array.from(productoIds)) : Promise.resolve({ data: [] }),
-        
-        usuarioIdsArray.length > 0 ? supabase
-          .from('auth.users')
-          .select('id, email')
-          .in('id', usuarioIdsArray) : Promise.resolve({ data: [] })
+          .in('id', Array.from(productoIds)) : Promise.resolve({ data: [] })
       ]);
 
       const clientesMap = new Map(clientesInfo.data?.map(c => [c.id, c]) || []);
       const productosMap = new Map(productosInfo.data?.map(p => [p.id, p.nombre]) || []);
-      const usuariosMap = new Map(usuariosInfo.data?.map(u => [u.id, u]) || []);
+      const usuariosMap = filtered.reduce((map, movimiento) => {
+        if (movimiento.usuario?.id) {
+          map.set(movimiento.usuario.id, movimiento.usuario);
+        }
+        return map;
+      }, new Map<string, { id: string; email: string }>());
 
       // Procesar movimientos con datos enriquecidos
       const processedMovimientos = filtered.map(movimiento => {
@@ -754,6 +740,10 @@ const Caja: React.FC = () => {
     setShowDeleteModal(true);
   };
 
+  const handleShowDetails = (movimiento: Movimiento) => {
+    setDetailMovement(movimiento);
+  };
+
   const handleSaveMovement = async (movementData: {
     tipo: string;
     descripcion: string;
@@ -906,8 +896,10 @@ const Caja: React.FC = () => {
         <CajaMovementsList
           movimientos={filteredMovimientos}
           isMobile={isMobile}
+          isAdmin={!!isAdmin}
           onEditMovement={handleEditMovement}
           onDeleteMovement={handleDeleteMovement}
+          onShowDetails={handleShowDetails}
         />
 
         <CajaMovementForm
@@ -930,6 +922,12 @@ const Caja: React.FC = () => {
           }}
           onConfirm={handleConfirmDelete}
           isDeleting={isDeleting}
+        />
+
+        <CajaMovementDetailsModal
+          movimiento={detailMovement}
+          isOpen={!!detailMovement}
+          onClose={() => setDetailMovement(null)}
         />
       </div>
     </div>

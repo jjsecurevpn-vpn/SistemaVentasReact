@@ -30,6 +30,7 @@ const Productos: React.FC = () => {
   const [formData, setFormData] = useState({
     nombre: "",
     precio: "",
+    precio_compra: "",
     stock: "",
     descripcion: "",
     notas: "",
@@ -86,6 +87,7 @@ const Productos: React.FC = () => {
     setFormData({
       nombre: "",
       precio: "",
+      precio_compra: "",
       stock: "",
       descripcion: "",
       notas: "",
@@ -102,6 +104,7 @@ const Productos: React.FC = () => {
       setFormData({
         nombre: product.nombre,
         precio: product.precio.toString(),
+        precio_compra: (product.precio_compra || 0).toString(),
         stock: product.stock.toString(),
         descripcion: product.descripcion || "",
         notas: product.notas || "",
@@ -113,6 +116,7 @@ const Productos: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const precio = parseFloat(formData.precio);
+    const precio_compra = parseFloat(formData.precio_compra) || 0;
     const stock = parseInt(formData.stock);
 
     if (isNaN(precio) || isNaN(stock)) {
@@ -125,6 +129,7 @@ const Productos: React.FC = () => {
         await editProduct(editingProduct.id, {
           nombre: formData.nombre,
           precio,
+          precio_compra,
           stock,
           descripcion: formData.descripcion,
           notas: formData.notas,
@@ -134,6 +139,7 @@ const Productos: React.FC = () => {
         await addProduct({
           nombre: formData.nombre,
           precio,
+          precio_compra,
           stock,
           descripcion: formData.descripcion,
           notas: formData.notas,

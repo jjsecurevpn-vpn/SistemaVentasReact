@@ -54,7 +54,8 @@ export const useSales = () => {
       fechaVencimiento?: string,
       notas?: string,
       notasFiado?: string,
-      usuarioId?: string
+      usuarioId?: string,
+      metodoPago?: string
     ) => {
       if (cart.length === 0) return;
       setLoading(true);
@@ -76,12 +77,14 @@ export const useSales = () => {
         // Create sale with notes
         const sale = await createSale(total, notas);
 
-        // Create sale products
+        // Create sale products with historical prices (precio al momento de la venta)
         const saleProducts = cart.map((item) => ({
           venta_id: sale.id,
           producto_id: item.product.id,
           cantidad: item.quantity,
           subtotal: item.subtotal,
+          precio_unitario: item.product.precio, // Precio de venta al momento de la transacción
+          precio_compra: item.product.precio_compra || 0, // Costo al momento de la transacción
         }));
         await createSaleProducts(saleProducts);
 
@@ -124,10 +127,9 @@ export const useSales = () => {
             descripcion: `Venta al fiado #${ventaFiadaId} - ${cart.length} producto${cart.length !== 1 ? 's' : ''}`,
             monto: total,
             categoria: "ventas_fiadas",
-            notas: `Cliente ID: ${clienteId}. Productos: ${cart
-              .map((item) => `${item.product.nombre} x${item.quantity} ($${item.subtotal.toFixed(2)})`)
-              .join(", ")}. ${notasFiado || ""}`,
+            notas: notasFiado || null, // Solo usar las notas del usuario
             usuario_id: usuarioId,
+            cliente_id: clienteId,
           };
 
           console.log(
@@ -162,10 +164,9 @@ export const useSales = () => {
             descripcion: `Venta #${sale.id} - ${cart.length} producto${cart.length !== 1 ? 's' : ''}`,
             monto: total,
             categoria: "ventas",
-            notas: `Productos vendidos: ${cart
-              .map((item) => `${item.product.nombre} x${item.quantity} ($${item.subtotal.toFixed(2)})`)
-              .join(", ")}`,
+            notas: notas || null, // Solo usar las notas del usuario, no auto-generar
             usuario_id: usuarioId,
+            metodo_pago: metodoPago?.trim() || "efectivo",
           };
 
           console.log("Movimiento data:", movimientoData);

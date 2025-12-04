@@ -3,19 +3,18 @@ import { formatTime, formatDate } from '../../utils/api';
 
 interface DashboardHeaderProps {
   currentTime: Date;
-  onFixDemoPrice: () => void;
 }
 
-const DashboardHeader: React.FC<DashboardHeaderProps> = ({ currentTime, onFixDemoPrice }) => {
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({ currentTime }) => {
   return (
     <div className="mb-8">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6 text-center md:text-left">
+        <div className="flex flex-col items-center md:items-start">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-neutral-200 mb-1">Dashboard</h1>
           <p className="text-neutral-400 text-sm">Resumen general de tu negocio</p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <div className="text-left md:text-right">
+        <div className="flex flex-col items-center md:items-end gap-2">
+          <div className="text-center md:text-right">
             <div className="text-xl sm:text-2xl md:text-3xl font-mono font-bold text-blue-400">
               {formatTime(currentTime.toISOString())}
             </div>
@@ -23,12 +22,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ currentTime, onFixDem
               {formatDate(currentTime.toISOString())}
             </div>
           </div>
-          <button
-            onClick={onFixDemoPrice}
-            className="px-3 py-1 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 text-xs rounded border border-orange-500/30"
-          >
-            Corregir Precio Demo
-          </button>
         </div>
       </div>
     </div>

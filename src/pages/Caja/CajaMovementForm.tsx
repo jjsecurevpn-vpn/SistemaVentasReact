@@ -16,6 +16,8 @@ interface Movimiento {
   usuario_id: string;
   venta_id?: number;
   cliente_id?: number;
+  metodo_pago?: string;
+  notas?: string;
   usuario?: {
     id: string;
     email: string;
@@ -44,6 +46,7 @@ interface MovementFormData {
   descripcion: string;
   monto: number;
   usuario_id: string;
+  metodo_pago: string | null;
 }
 
 interface CajaMovementFormProps {
@@ -65,7 +68,8 @@ const CajaMovementForm: React.FC<CajaMovementFormProps> = ({
     tipo: 'ingreso',
     descripcion: '',
     monto: 0,
-    usuario_id: currentUserId
+    usuario_id: currentUserId,
+    metodo_pago: null
   });
 
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
@@ -134,14 +138,16 @@ const CajaMovementForm: React.FC<CajaMovementFormProps> = ({
         tipo: movimiento.tipo,
         descripcion: movimiento.descripcion,
         monto: movimiento.monto,
-        usuario_id: movimiento.usuario_id
+        usuario_id: movimiento.usuario_id,
+        metodo_pago: movimiento.metodo_pago || null
       });
     } else {
       setFormData({
         tipo: 'ingreso',
         descripcion: '',
         monto: 0,
-        usuario_id: currentUserId
+        usuario_id: currentUserId,
+        metodo_pago: null
       });
     }
   }, [movimiento, currentUserId]);
@@ -151,7 +157,8 @@ const CajaMovementForm: React.FC<CajaMovementFormProps> = ({
     // Agregar la fecha actual al enviar
     const movementDataWithDate = {
       ...formData,
-      fecha: new Date().toISOString()
+      fecha: new Date().toISOString(),
+      metodo_pago: formData.metodo_pago || null
     };
     onSave(movementDataWithDate);
   };
@@ -160,117 +167,151 @@ const CajaMovementForm: React.FC<CajaMovementFormProps> = ({
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'monto' ? parseFloat(value) || 0 : value
+      [name]: name === 'monto'
+        ? parseFloat(value) || 0
+        : name === 'metodo_pago'
+          ? (value === '' ? null : value)
+          : value
     }));
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg w-full max-w-md">
-        <div className="flex items-center justify-between p-4 border-b border-neutral-800">
-          <h2 className="text-lg font-semibold text-neutral-200">
+    <div className="fixed inset-0 z-[11000] bg-black/70 backdrop-blur-sm overflow-y-auto">
+      <div className="min-h-full flex items-start justify-center px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 pt-24 sm:pt-28 md:pt-32 pb-12">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl w-full max-w-5xl xl:max-w-6xl shadow-2xl max-h-[calc(100vh-6rem)] overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-5 sm:p-6 border-b border-neutral-800">
+          <h2 className="text-base sm:text-lg font-semibold text-neutral-200">
             {movimiento ? 'Editar Movimiento' : 'Nuevo Movimiento'}
           </h2>
           <button
             onClick={onClose}
             className="text-neutral-400 hover:text-neutral-200 transition-colors"
           >
-            <MdClose size={24} />
+            <MdClose className="text-xl" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">
-              Tipo
-            </label>
-            <select
-              name="tipo"
-              value={formData.tipo}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-              required
-            >
-              <option value="ingreso">Ingreso</option>
-              <option value="gasto">Gasto</option>
-              <option value="fiado">Fiado</option>
-              <option value="pago_fiado">Pago Fiado</option>
-            </select>
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-10rem)]">
+          <div className="grid gap-6 lg:grid-cols-[1.25fr_0.85fr]">
+            <div className="space-y-5">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
+                  Descripción
+                </label>
+                <textarea
+                  name="descripcion"
+                  value={formData.descripcion}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent resize-none"
+                  rows={6}
+                  placeholder="Descripción del movimiento..."
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
+                    Tipo
+                  </label>
+                  <select
+                    name="tipo"
+                    value={formData.tipo}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="ingreso">Ingreso</option>
+                    <option value="gasto">Gasto</option>
+                    <option value="fiado">Fiado</option>
+                    <option value="pago_fiado">Pago Fiado</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
+                    Método de Pago
+                  </label>
+                  <select
+                    name="metodo_pago"
+                    value={formData.metodo_pago ?? ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Seleccionar método</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
+                    Monto
+                  </label>
+                  <input
+                    type="number"
+                    name="monto"
+                    value={formData.monto}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                    step="0.01"
+                    min="0"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
+                    Usuario Responsable
+                  </label>
+                  <select
+                    name="usuario_id"
+                    value={formData.usuario_id}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                    required
+                    disabled={loadingUsers}
+                  >
+                    {loadingUsers ? (
+                      <option>Cargando usuarios...</option>
+                    ) : (
+                      availableUsers.map(user => (
+                        <option key={user.id} value={user.id}>
+                          {user.email}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">
-              Descripción
-            </label>
-            <textarea
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent resize-none"
-              rows={3}
-              placeholder="Descripción del movimiento..."
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">
-              Monto
-            </label>
-            <input
-              type="number"
-              name="monto"
-              value={formData.monto}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-              step="0.01"
-              min="0"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">
-              Usuario Responsable
-            </label>
-            <select
-              name="usuario_id"
-              value={formData.usuario_id}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-              required
-              disabled={loadingUsers}
-            >
-              {loadingUsers ? (
-                <option>Cargando usuarios...</option>
-              ) : (
-                availableUsers.map(user => (
-                  <option key={user.id} value={user.id}>
-                    {user.email}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-sm font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 text-xs sm:text-sm font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
             >
               {movimiento ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

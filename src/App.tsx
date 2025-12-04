@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import PullToRefreshIndicator from './components/PullToRefreshIndicator';
-import POS from './pages/POS';
+import POS from './pages/POS/index';
 import Productos from './pages/Productos';
 import Clientes from './pages/Clientes/index';
 import Caja from './pages/Caja/index';

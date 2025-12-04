@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS movimientos_caja (
   tipo TEXT NOT NULL CHECK (tipo IN ('ingreso', 'gasto', 'fiado', 'pago_fiado')),
   descripcion TEXT NOT NULL,
   monto NUMERIC NOT NULL,
+  metodo_pago TEXT,
   categoria TEXT,
   notas TEXT,
   usuario_id UUID REFERENCES auth.users(id)
@@ -86,6 +87,7 @@ CREATE TABLE IF NOT EXISTS pagos_fiados (
   venta_fiada_id INTEGER REFERENCES ventas_fiadas(id),
   fecha TIMESTAMP DEFAULT NOW(),
   monto NUMERIC NOT NULL,
+  metodo_pago TEXT,
   notas TEXT,
   usuario_id UUID REFERENCES auth.users(id)
 );
@@ -151,6 +153,8 @@ ON CONFLICT (name) DO NOTHING;
 -- Asegurar que la columna usuario_id existe antes de configurar políticas
 ALTER TABLE movimientos_caja ADD COLUMN IF NOT EXISTS usuario_id UUID REFERENCES auth.users(id);
 ALTER TABLE pagos_fiados ADD COLUMN IF NOT EXISTS usuario_id UUID REFERENCES auth.users(id);
+ALTER TABLE movimientos_caja ADD COLUMN IF NOT EXISTS metodo_pago TEXT;
+ALTER TABLE pagos_fiados ADD COLUMN IF NOT EXISTS metodo_pago TEXT;
 
 -- Habilitar RLS en las tablas
 ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
