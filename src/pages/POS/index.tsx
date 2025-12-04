@@ -222,11 +222,11 @@ const POS: React.FC = () => {
   };
 
   return (
-    <div className="h-full bg-[#181818] flex flex-col">
+    <div className="h-full bg-[#0a0a0a] flex flex-col">
       {/* Error Messages */}
       {(productsError || saleError || promosError) && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-11/12 md:w-auto">
-          <div className="text-red-400 text-sm bg-red-900/20 border border-red-800/50 p-3 rounded-lg">
+        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 w-11/12 md:w-auto">
+          <div className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-lg">
             {productsError || saleError || promosError}
           </div>
         </div>
@@ -284,18 +284,18 @@ const POS: React.FC = () => {
       {/* Modal de selección de cliente */}
       {clienteDropdownOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => {
             setClienteDropdownOpen(false);
             setSearchCliente("");
           }}
         >
           <div
-            className="bg-neutral-900 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col"
+            className="bg-[#111111] border border-neutral-800/50 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b border-neutral-800">
-              <h3 className="text-lg font-semibold text-neutral-200 mb-3">
+            <div className="p-4 border-b border-neutral-800/50">
+              <h3 className="text-sm font-medium text-white mb-3">
                 Seleccionar Cliente
               </h3>
               <input
@@ -303,16 +303,16 @@ const POS: React.FC = () => {
                 placeholder="Buscar cliente..."
                 value={searchCliente}
                 onChange={(e) => setSearchCliente(e.target.value)}
-                className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-neutral-900/50 border border-neutral-800 text-white rounded-lg text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-600"
               />
             </div>
             <div className="flex-1 overflow-auto">
               {filteredClientes.length === 0 ? (
-                <div className="px-4 py-12 text-center text-neutral-400 text-sm">
-                  <CreditCard className="mx-auto mb-2 opacity-50" size={32} />
-                  {clientes.length === 0
+                <div className="px-4 py-12 text-center text-neutral-500 text-sm">
+                  <CreditCard className="mx-auto mb-2 opacity-30" size={24} />
+                  <p className="text-xs">{clientes.length === 0
                     ? "No hay clientes registrados"
-                    : "No se encontraron clientes"}
+                    : "No se encontraron clientes"}</p>
                 </div>
               ) : (
                 filteredClientes.map((cliente) => (
@@ -323,22 +323,22 @@ const POS: React.FC = () => {
                       setClienteDropdownOpen(false);
                       setSearchCliente("");
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800/30 last:border-b-0"
+                    className="w-full text-left px-4 py-3 hover:bg-neutral-800/50 transition-colors border-b border-neutral-800/30 last:border-b-0"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-sm font-bold">
+                      <div className="w-8 h-8 bg-neutral-800 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-neutral-400 text-xs font-medium">
                           {cliente.nombre.charAt(0)}
                           {cliente.apellido?.charAt(0) || ""}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-neutral-100 text-sm truncate">
+                        <p className="text-sm text-white truncate">
                           {cliente.nombre} {cliente.apellido || ""}
                         </p>
-                        <div className="text-xs text-neutral-400 truncate">
+                        <p className="text-xs text-neutral-500 truncate">
                           {cliente.telefono || cliente.email || ""}
-                        </div>
+                        </p>
                       </div>
                     </div>
                   </button>

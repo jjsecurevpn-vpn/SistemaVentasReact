@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdSearch, MdFilterList, MdClear, MdExpandMore, MdExpandLess, MdCalendarToday, MdPerson, MdCategory } from 'react-icons/md';
+import { Search, Filter, X, ChevronDown, ChevronUp, User } from 'lucide-react';
 
 interface CajaFiltersProps {
   showFilters: boolean;
@@ -40,7 +40,6 @@ const CajaFilters: React.FC<CajaFiltersProps> = ({
 }) => {
   const hasActiveFilters = searchTerm || selectedTypes.length > 0 || fechaDesde || fechaHasta || usuarioFilter;
 
-  // Determinar qué opciones mostrar como seleccionadas
   const allTypes = ['ingreso', 'gasto', 'fiado', 'pago_fiado'];
   const isAllSelected = allTypes.every(type => selectedTypes.includes(type));
   const displaySelectedTypes = isAllSelected ? ['todos'] : selectedTypes;
@@ -52,14 +51,12 @@ const CajaFilters: React.FC<CajaFiltersProps> = ({
 
   return (
     <div className="mb-6">
-      {/* Header minimalista con botón colapsable */}
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 sm:px-5 py-4">
+      {/* Header */}
+      <div className="bg-neutral-900/40 border border-neutral-800/50 rounded-xl px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-neutral-100">
-              Movimientos de caja
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-500">
+            <h2 className="text-sm font-medium text-white">Movimientos</h2>
+            <p className="text-[10px] text-neutral-600">
               {filteredCount} {filteredCount === 1 ? 'resultado' : 'resultados'}
               {totalCount !== undefined && totalCount !== filteredCount && ` de ${totalCount}`}
             </p>
@@ -67,88 +64,81 @@ const CajaFilters: React.FC<CajaFiltersProps> = ({
 
           <button
             onClick={onToggleFilters}
-            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               showFilters
-                ? 'bg-blue-600 text-white'
-                : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                ? 'bg-white text-black'
+                : 'bg-neutral-800 text-neutral-400 hover:text-white'
             }`}
           >
-            <MdFilterList size={17} />
+            <Filter size={14} />
             Filtros
-            {hasActiveFilters && <span className="ml-1.5 w-2 h-2 bg-white rounded-full animate-pulse" />}
-            {showFilters ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+            {hasActiveFilters && !showFilters && (
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+            )}
+            {showFilters ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
         </div>
       </div>
 
-      {/* Panel colapsable con animación suave */}
+      {/* Panel colapsable */}
       <div
-        className={`transition-all duration-500 ease-in-out overflow-hidden ${
+        className={`transition-all duration-300 overflow-hidden ${
           showFilters ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="bg-neutral-900/70 border border-neutral-800/70 rounded-xl mt-3 p-4 sm:p-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+        <div className="bg-neutral-900/30 border border-neutral-800/50 border-t-0 rounded-b-xl p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             {/* Buscador */}
-            <div className="relative">
-              <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-base sm:text-lg" />
+            <div className="relative lg:col-span-2">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Buscar descripción, cliente o producto..."
-                className="w-full pl-9 pr-3 sm:pr-4 py-2 bg-neutral-800/70 border border-neutral-700 rounded-lg text-neutral-200 placeholder-neutral-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                placeholder="Buscar..."
+                className="w-full pl-9 pr-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-xs placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors"
               />
             </div>
 
             {/* Tipos */}
-            <div className="relative">
-              <MdCategory className="absolute left-3 top-3 text-neutral-500 text-sm" />
-              <select
-                multiple
-                value={displaySelectedTypes}
-                onChange={handleTypesChange}
-                className="w-full pl-9 pr-3 py-2 bg-neutral-800/70 border border-neutral-700 rounded-lg text-neutral-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-24 sm:h-28 scrollbar-thin scrollbar-thumb-neutral-600"
-              >
-                <option value="todos">🔄 Todos</option>
-                <option value="ingreso">💰 Ingreso</option>
-                <option value="gasto">📤 Gasto</option>
-                <option value="fiado">📝 Fiado</option>
-                <option value="pago_fiado">✅ Pago Fiado</option>
-              </select>
-            </div>
+            <select
+              multiple
+              value={displaySelectedTypes}
+              onChange={handleTypesChange}
+              className="px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-700 h-20"
+            >
+              <option value="todos">Todos</option>
+              <option value="ingreso">Ingreso</option>
+              <option value="gasto">Gasto</option>
+              <option value="fiado">Fiado</option>
+              <option value="pago_fiado">Pago Fiado</option>
+            </select>
 
-            {/* Fecha Desde */}
-            <div className="relative">
-              <MdCalendarToday className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm" />
+            {/* Fechas */}
+            <div className="space-y-2">
               <input
                 type="date"
                 value={fechaDesde}
                 onChange={(e) => onFechaDesdeChange(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-neutral-800/70 border border-neutral-700 rounded-lg text-neutral-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 cursor-pointer"
+                className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-700"
               />
-            </div>
-
-            {/* Fecha Hasta */}
-            <div className="relative">
-              <MdCalendarToday className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm" />
               <input
                 type="date"
                 value={fechaHasta}
                 onChange={(e) => onFechaHastaChange(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-neutral-800/70 border border-neutral-700 rounded-lg text-neutral-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 cursor-pointer"
+                className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-700"
               />
             </div>
 
             {/* Usuario */}
             <div className="relative">
-              <MdPerson className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm" />
+              <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
               <select
                 value={usuarioFilter}
                 onChange={(e) => onUsuarioFilterChange(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-neutral-800/70 border border-neutral-700 rounded-lg text-neutral-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="w-full pl-9 pr-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-xs focus:outline-none focus:border-neutral-700"
               >
-                <option value="">Todos los usuarios</option>
+                <option value="">Todos</option>
                 {usuariosUnicos.map(email => (
                   <option key={email} value={email}>{email}</option>
                 ))}
@@ -156,15 +146,15 @@ const CajaFilters: React.FC<CajaFiltersProps> = ({
             </div>
           </div>
 
-          {/* Limpiar filtros (solo si hay activos) */}
+          {/* Limpiar filtros */}
           {hasActiveFilters && (
-            <div className="flex justify-end mt-4 sm:mt-5 pt-4 border-t border-neutral-700">
+            <div className="flex justify-end mt-3 pt-3 border-t border-neutral-800/50">
               <button
                 onClick={onClearAllFilters}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-red-400 hover:bg-red-600/20 rounded-lg transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
               >
-                <MdClear className="text-sm sm:text-base" />
-                Limpiar filtros
+                <X size={14} />
+                Limpiar
               </button>
             </div>
           )}

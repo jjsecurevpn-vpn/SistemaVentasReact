@@ -82,10 +82,10 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#181818] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-neutral-400">Cargando dashboard...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-700 border-t-neutral-400 mx-auto mb-4"></div>
+          <p className="text-neutral-500 text-sm font-medium tracking-wide">Cargando...</p>
         </div>
       </div>
     );
@@ -93,9 +93,9 @@ const Dashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#181818] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
         <div className="text-center">
-          <AlertCircle className="mx-auto mb-4 text-red-400" size={48} />
+          <AlertCircle className="mx-auto mb-4 text-red-500/70" size={32} />
           <p className="text-red-400">Error: {error}</p>
         </div>
       </div>
@@ -106,8 +106,8 @@ const Dashboard: React.FC = () => {
   const ultimoDiaMes = new Date(año, mes, 0).getDate();
 
   return (
-    <div className="min-h-screen bg-[#181818] overflow-x-hidden w-full">
-      <div className="px-4 py-6 sm:px-6 md:px-8 md:py-8 lg:max-w-7xl xl:max-w-[1800px] mx-auto max-w-full overflow-x-hidden w-full box-border">
+    <div className="min-h-screen bg-[#0a0a0a] overflow-x-hidden w-full">
+      <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 max-w-7xl mx-auto w-full">
         <DashboardHeader currentTime={currentTime} />
 
         <MonthSelector
@@ -130,7 +130,7 @@ const Dashboard: React.FC = () => {
 
         <FinancialStats stats={stats} formatCurrency={formatCurrency} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           <TopProducts
             productosVendidos={productosVendidos}
             formatCurrency={formatCurrency}

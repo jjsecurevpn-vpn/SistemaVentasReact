@@ -146,82 +146,52 @@ const Clientes: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-gray-400">Cargando clientes...</div>
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-700 border-t-neutral-400 mx-auto mb-3"></div>
+          <p className="text-neutral-600 text-sm">Cargando clientes...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-red-400">Error: {error}</div>
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-red-400 text-sm">Error: {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
       {/* Modal de confirmación para eliminar cliente */}
       <Modal
         isOpen={!!clientePendienteEliminar}
         onClose={handleCloseNotification}
-        title="Confirmar eliminación"
+        title="Eliminar cliente"
         size="sm"
       >
-        <div className="space-y-6">
-          <p className="text-lg text-center text-red-300 font-semibold">
+        <div className="text-center">
+          <p className="text-neutral-400 text-sm mb-6">
             ¿Seguro que deseas eliminar a{" "}
-            <span className="text-white">
+            <span className="text-white font-medium">
               {clientePendienteEliminar?.nombre}
             </span>
-            ?<br />
-            Esta acción no se puede deshacer.
+            ? Esta acción no se puede deshacer.
           </p>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={confirmarEliminarCliente}
-              className="px-5 py-2 bg-red-600 text-white rounded-lg font-semibold shadow hover:bg-red-700 transition-colors"
-            >
-              Sí, eliminar
-            </button>
+          <div className="flex gap-2 justify-center">
             <button
               onClick={handleCloseNotification}
-              className="px-5 py-2 bg-neutral-700 text-white rounded-lg font-semibold shadow hover:bg-neutral-600 transition-colors"
+              className="px-4 py-2 text-sm text-neutral-400 hover:text-white transition-colors"
             >
               Cancelar
             </button>
-          </div>
-        </div>
-      </Modal>
-      {/* Modal de confirmación para eliminar cliente */}
-      <Modal
-        isOpen={!!clientePendienteEliminar}
-        onClose={handleCloseNotification}
-        title="Confirmar eliminación"
-        size="sm"
-      >
-        <div className="space-y-6">
-          <p className="text-lg text-center text-red-300 font-semibold">
-            ¿Seguro que deseas eliminar a{" "}
-            <span className="text-white">
-              {clientePendienteEliminar?.nombre}
-            </span>
-            ?<br />
-            Esta acción no se puede deshacer.
-          </p>
-          <div className="flex gap-4 justify-center">
             <button
               onClick={confirmarEliminarCliente}
-              className="px-5 py-2 bg-red-600 text-white rounded-lg font-semibold shadow hover:bg-red-700 transition-colors"
+              className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
             >
-              Sí, eliminar
-            </button>
-            <button
-              onClick={handleCloseNotification}
-              className="px-5 py-2 bg-neutral-700 text-white rounded-lg font-semibold shadow hover:bg-neutral-600 transition-colors"
-            >
-              Cancelar
+              Eliminar
             </button>
           </div>
         </div>

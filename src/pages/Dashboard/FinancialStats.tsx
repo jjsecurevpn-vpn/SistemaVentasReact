@@ -8,55 +8,58 @@ interface FinancialStatsProps {
 }
 
 const FinancialStats: React.FC<FinancialStatsProps> = ({ stats, formatCurrency }) => {
+  const financialItems = [
+    {
+      label: 'Total Acumulado',
+      value: stats?.dinero_disponible || 0,
+      icon: DollarSign,
+      description: 'Saldo total del negocio',
+      badge: 'Disponible',
+      badgeColor: 'text-blue-400 bg-blue-500/10'
+    },
+    {
+      label: 'Gastos del Mes',
+      value: stats?.gastos_mes || 0,
+      icon: TrendingDown,
+      description: 'Mes actual',
+      badge: 'Gastos',
+      badgeColor: 'text-red-400 bg-red-500/10'
+    },
+    {
+      label: 'Dinero Fiado',
+      value: stats?.dinero_fiado_pendiente || 0,
+      icon: CreditCard,
+      description: 'Pendiente de pago',
+      badge: 'Pendiente',
+      badgeColor: 'text-orange-400 bg-orange-500/10'
+    }
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8 w-full">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 hover:border-neutral-700 transition-all min-w-0 w-full">
-        <div className="flex items-start justify-between mb-4">
-          <div className="p-2 bg-blue-500/10 rounded-lg">
-            <DollarSign className="text-blue-400" size={24} strokeWidth={1.5} />
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 mb-6 lg:mb-8">
+      {financialItems.map((item, index) => {
+        const Icon = item.icon;
+        return (
+          <div 
+            key={index}
+            className="p-4 rounded-xl bg-neutral-900/40 border border-neutral-800/50 hover:border-neutral-700/50 transition-all"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Icon size={16} className="text-neutral-500" strokeWidth={1.5} />
+                <span className="text-xs text-neutral-500 font-medium">{item.label}</span>
+              </div>
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${item.badgeColor}`}>
+                {item.badge}
+              </span>
+            </div>
+            <p className="text-xl font-semibold text-white truncate mb-1">
+              {formatCurrency(item.value)}
+            </p>
+            <p className="text-[10px] text-neutral-600">{item.description}</p>
           </div>
-          <span className="text-xs text-blue-400 bg-blue-500/10 px-2 py-1 rounded-full">
-            Disponible
-          </span>
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs text-neutral-500 mb-1">Total Acumulado</p>
-          <p className="text-xl sm:text-2xl font-bold text-neutral-200 truncate">{formatCurrency(stats?.dinero_disponible || 0)}</p>
-          <p className="text-xs text-neutral-600 mt-2">Saldo total del negocio</p>
-        </div>
-      </div>
-
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 hover:border-neutral-700 transition-all min-w-0">
-        <div className="flex items-start justify-between mb-4">
-          <div className="p-2 bg-red-500/10 rounded-lg">
-            <TrendingDown className="text-red-400" size={24} strokeWidth={1.5} />
-          </div>
-          <span className="text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded-full">
-            Gastos
-          </span>
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs text-neutral-500 mb-1">Total Mes</p>
-          <p className="text-xl sm:text-2xl font-bold text-neutral-200 truncate">{formatCurrency(stats?.gastos_mes || 0)}</p>
-          <p className="text-xs text-neutral-600 mt-2">Mes actual</p>
-        </div>
-      </div>
-
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 hover:border-neutral-700 transition-all min-w-0">
-        <div className="flex items-start justify-between mb-4">
-          <div className="p-2 bg-orange-500/10 rounded-lg">
-            <CreditCard className="text-orange-400" size={24} strokeWidth={1.5} />
-          </div>
-          <span className="text-xs text-orange-400 bg-orange-500/10 px-2 py-1 rounded-full">
-            Pendiente
-          </span>
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs text-neutral-500 mb-1">Dinero Fiado</p>
-          <p className="text-xl sm:text-2xl font-bold text-neutral-200 truncate">{formatCurrency(stats?.dinero_fiado_pendiente || 0)}</p>
-          <p className="text-xs text-neutral-600 mt-2">Pendiente de pago</p>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 };

@@ -9,28 +9,26 @@ interface ProductHeaderProps {
 
 const ProductHeader: React.FC<ProductHeaderProps> = ({ isAdmin, onNewProduct, onNewPromo }) => {
   return (
-    <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-200 mb-2">
-          Gestión de Productos
-        </h1>
-        <p className="text-neutral-400 text-sm">Administra tu inventario</p>
+        <h1 className="text-xl font-semibold text-white">Productos</h1>
+        <p className="text-neutral-500 text-xs mt-0.5">Gestiona tu inventario</p>
       </div>
       {isAdmin && (
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex gap-2">
           <button
             onClick={onNewPromo}
-            className="flex items-center gap-2 rounded-lg border border-emerald-700/60 bg-emerald-600/10 px-4 py-2.5 text-sm font-medium text-emerald-300 hover:border-emerald-500 hover:bg-emerald-600/20 transition-all"
+            className="flex items-center gap-1.5 rounded-lg border border-emerald-500/30 px-3 py-2 text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors"
           >
-            <Plus size={16} />
-            <span>Nueva Promo</span>
+            <Plus size={14} />
+            <span>Promo</span>
           </button>
           <button
             onClick={onNewProduct}
-            className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-sm font-medium text-neutral-200 hover:border-neutral-500 hover:bg-neutral-700 transition-all"
+            className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-medium text-black hover:bg-neutral-200 transition-colors"
           >
-            <Plus size={16} />
-            <span>Nuevo Producto</span>
+            <Plus size={14} />
+            <span>Producto</span>
           </button>
         </div>
       )}

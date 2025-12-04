@@ -22,29 +22,29 @@ const SaleConfirmationModal: React.FC<SaleConfirmationModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-neutral-900 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-[#111111] border border-neutral-800/50 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-neutral-800">
+        <div className="p-4 border-b border-neutral-800/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-500/20 rounded-full">
-                <CheckCircle className="text-green-400" size={24} />
+              <div className="p-2 bg-emerald-500/10 rounded-full">
+                <CheckCircle className="text-emerald-400" size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-neutral-200">
-                  ¡Venta Confirmada!
+                <h3 className="text-sm font-medium text-white">
+                  Venta Confirmada
                 </h3>
-                <p className="text-sm text-neutral-400">
-                  {isCreditSale ? 'Venta al fiado registrada' : 'Venta completada exitosamente'}
+                <p className="text-xs text-neutral-500">
+                  {isCreditSale ? 'Registrada al fiado' : 'Completada'}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-neutral-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-neutral-800/50 rounded-lg transition-colors"
             >
-              <X size={20} className="text-neutral-400" />
+              <X size={16} className="text-neutral-500" />
             </button>
           </div>
         </div>
@@ -53,8 +53,8 @@ const SaleConfirmationModal: React.FC<SaleConfirmationModalProps> = ({
         <div className="flex-1 overflow-auto p-4">
           {/* Client Info (if credit sale) */}
           {isCreditSale && clientName && (
-            <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-              <p className="text-sm text-blue-400">
+            <div className="mb-4 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg">
+              <p className="text-xs text-amber-400">
                 <span className="font-medium">Cliente:</span> {clientName}
               </p>
             </div>
@@ -63,42 +63,34 @@ const SaleConfirmationModal: React.FC<SaleConfirmationModalProps> = ({
           {/* Products List */}
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <ShoppingCart size={18} className="text-neutral-400" />
-              <h4 className="font-medium text-neutral-200">Productos Vendidos</h4>
+              <ShoppingCart size={14} className="text-neutral-500" />
+              <span className="text-xs font-medium text-neutral-500">Productos</span>
             </div>
             <div className="space-y-2">
               {cart.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between py-2 px-3 bg-neutral-800/50 rounded-lg"
+                  className="flex items-center justify-between py-2.5 px-3 bg-neutral-900/40 border border-neutral-800/50 rounded-lg"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-neutral-200 truncate flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       {item.type === 'promo' && (
-                        <span className="px-2 py-0.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-[10px] uppercase tracking-wider">
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-medium">
                           Promo
                         </span>
                       )}
+                      <p className="text-sm text-white truncate">
                         {item.type === 'promo' ? item.promo.nombre : item.product.nombre}
-                    </p>
-                    <p className="text-sm text-neutral-400">
+                      </p>
+                    </div>
+                    <p className="text-xs text-neutral-500 mt-0.5">
                       {item.type === 'promo'
                         ? `${item.quantity} combo(s)`
                         : `$${item.product.precio.toFixed(2)} × ${item.quantity}`}
                     </p>
-                    {item.type === 'promo' && (
-                      <p className="text-xs text-neutral-500 mt-1">
-                        {item.promo.promo_productos
-                          ?.map(
-                            (pp) =>
-                                `×${pp.cantidad * item.quantity} ${pp.producto?.nombre || 'Producto'}`
-                          )
-                          .join(' · ')}
-                      </p>
-                    )}
                   </div>
                   <div className="text-right ml-3">
-                    <p className="font-semibold text-green-400">
+                    <p className="text-sm font-medium text-emerald-400">
                       ${item.subtotal.toFixed(2)}
                     </p>
                   </div>
@@ -108,10 +100,10 @@ const SaleConfirmationModal: React.FC<SaleConfirmationModalProps> = ({
           </div>
 
           {/* Total */}
-          <div className="border-t border-neutral-800 pt-4">
+          <div className="border-t border-neutral-800/50 pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-medium text-neutral-200">Total</span>
-              <span className="text-xl font-bold text-green-400">
+              <span className="text-sm text-neutral-500">Total</span>
+              <span className="text-xl font-semibold text-white">
                 ${total.toFixed(2)}
               </span>
             </div>
@@ -119,10 +111,10 @@ const SaleConfirmationModal: React.FC<SaleConfirmationModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-neutral-800">
+        <div className="p-4 border-t border-neutral-800/50">
           <button
             onClick={onClose}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg font-semibold transition-colors"
+            className="w-full bg-white hover:bg-neutral-200 text-black py-2.5 rounded-lg font-medium text-sm transition-colors"
           >
             Aceptar
           </button>

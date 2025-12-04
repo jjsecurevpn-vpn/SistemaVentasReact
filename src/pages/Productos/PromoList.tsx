@@ -12,16 +12,17 @@ interface PromoListProps {
 const PromoList: React.FC<PromoListProps> = ({ promos, loading, onToggle, onDelete }) => {
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12 text-neutral-400">
-        Cargando promos...
+      <div className="flex items-center justify-center py-8 text-neutral-600 text-sm">
+        <div className="animate-spin rounded-full h-5 w-5 border-2 border-neutral-700 border-t-neutral-400 mr-2"></div>
+        Cargando...
       </div>
     );
   }
 
   if (!promos.length) {
     return (
-      <div className="border border-dashed border-neutral-700 rounded-xl p-6 text-center text-neutral-500">
-        Aún no tienes promociones. ¡Crea la primera para acelerar las ventas!
+      <div className="border border-dashed border-neutral-800/50 rounded-xl p-6 text-center text-neutral-600 text-sm">
+        Sin promociones activas
       </div>
     );
   }
@@ -30,16 +31,16 @@ const PromoList: React.FC<PromoListProps> = ({ promos, loading, onToggle, onDele
 
   const getVigenciaBadge = (promo: Promo) => {
     if (promo.fecha_inicio && promo.fecha_inicio > today) {
-      return <span className="text-xs text-blue-400">Próxima ({promo.fecha_inicio})</span>;
+      return <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">Próxima</span>;
     }
     if (promo.fecha_fin && promo.fecha_fin < today) {
-      return <span className="text-xs text-red-400">Expirada</span>;
+      return <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400">Expirada</span>;
     }
-    return <span className="text-xs text-emerald-400">Activa</span>;
+    return <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400">Activa</span>;
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {promos.map((promo) => {
         const usosRestantes = promo.limite_uso
           ? Math.max(0, promo.limite_uso - (promo.usos_registrados || 0))
@@ -47,79 +48,70 @@ const PromoList: React.FC<PromoListProps> = ({ promos, loading, onToggle, onDele
         return (
           <div
             key={promo.id}
-            className="border border-neutral-800 bg-neutral-900 rounded-xl p-4 flex flex-col gap-4"
+            className="border border-neutral-800/50 bg-neutral-900/40 rounded-xl p-3"
           >
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Tag size={16} className="text-emerald-400" />
-                  <h3 className="text-lg font-semibold text-neutral-100">{promo.nombre}</h3>
-                  <span className="text-sm font-semibold text-emerald-400">
-                    ${promo.precio_promocional.toFixed(2)}
+            {/* Header */}
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Tag size={12} className="text-emerald-400" />
+                  <h3 className="text-sm font-medium text-white">{promo.nombre}</h3>
+                  <span className="text-xs font-semibold text-emerald-400">
+                    ${promo.precio_promocional.toFixed(0)}
                   </span>
+                  {getVigenciaBadge(promo)}
                 </div>
-                <p className="text-sm text-neutral-400">
-                  {promo.descripcion || "Sin descripción"}
-                </p>
-                <div className="flex items-center gap-4 mt-1 text-xs text-neutral-500">
-                  {promo.fecha_inicio && (
-                    <span>Inicio: {promo.fecha_inicio}</span>
-                  )}
-                  {promo.fecha_fin && <span>Fin: {promo.fecha_fin}</span>}
-                  {usosRestantes !== null && (
-                    <span>
-                      Límite: {promo.limite_uso} (restan {usosRestantes})
-                    </span>
-                  )}
-                </div>
+                {promo.descripcion && (
+                  <p className="text-xs text-neutral-600 mt-0.5 truncate">
+                    {promo.descripcion}
+                  </p>
+                )}
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                {getVigenciaBadge(promo)}
+              <div className="flex items-center gap-1 ml-2">
                 <button
                   onClick={() => onToggle(promo.id, !promo.activo)}
-                  className="flex items-center gap-1 px-3 py-1 rounded-lg border border-neutral-700 text-neutral-200 hover:border-neutral-500"
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    promo.activo 
+                      ? "text-emerald-400 hover:bg-emerald-500/10" 
+                      : "text-neutral-600 hover:bg-neutral-800/50"
+                  }`}
+                  title={promo.activo ? "Desactivar" : "Activar"}
                 >
-                  {promo.activo ? (
-                    <>
-                      <ToggleRight size={16} className="text-emerald-400" />
-                      Desactivar
-                    </>
-                  ) : (
-                    <>
-                      <ToggleLeft size={16} className="text-neutral-400" />
-                      Activar
-                    </>
-                  )}
+                  {promo.activo ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
                 </button>
                 <button
                   onClick={() => onDelete(promo.id)}
-                  className="p-2 rounded-lg border border-transparent hover:border-red-500/40 text-red-400"
+                  className="p-1.5 rounded-lg text-neutral-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="Eliminar"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            {/* Info */}
+            {(promo.fecha_inicio || promo.fecha_fin || usosRestantes !== null) && (
+              <div className="flex items-center gap-3 mb-2 text-[10px] text-neutral-600">
+                {promo.fecha_inicio && <span>Desde: {promo.fecha_inicio}</span>}
+                {promo.fecha_fin && <span>Hasta: {promo.fecha_fin}</span>}
+                {usosRestantes !== null && <span>Usos: {usosRestantes}/{promo.limite_uso}</span>}
+              </div>
+            )}
+
+            {/* Products */}
+            <div className="flex flex-wrap gap-1.5">
               {promo.promo_productos?.map((item) => (
                 <div
                   key={`${promo.id}-${item.producto_id}`}
-                  className="flex items-center justify-between bg-neutral-800/60 rounded-lg px-3 py-2"
+                  className="flex items-center gap-1.5 bg-neutral-800/40 rounded-lg px-2 py-1"
                 >
-                  <div>
-                    <p className="text-neutral-200 font-medium">
-                      {item.producto?.nombre || `Producto #${item.producto_id}`}
-                    </p>
-                    <p className="text-xs text-neutral-500">
-                      Precio normal: ${item.producto?.precio?.toFixed(2) ?? "-"}
-                    </p>
-                  </div>
-                  <span className="text-sm font-semibold text-neutral-300">
-                    ×{item.cantidad}
+                  <span className="text-xs text-neutral-400">
+                    {item.producto?.nombre || `#${item.producto_id}`}
                   </span>
+                  <span className="text-[10px] text-neutral-600">×{item.cantidad}</span>
                 </div>
               )) || (
-                <div className="text-neutral-500">Sin productos asociados</div>
+                <span className="text-xs text-neutral-600">Sin productos</span>
               )}
             </div>
           </div>

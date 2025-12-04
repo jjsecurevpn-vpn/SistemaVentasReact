@@ -19,7 +19,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
   onOpenModal,
 }) => {
   return (
-    <div className="md:hidden space-y-3 w-full box-border">
+    <div className="md:hidden space-y-2">
       {products.map((product) => {
         const ganancia = calcularGanancia(product.precio, product.precio_compra);
         const margen = calcularMargen(product.precio, product.precio_compra);
@@ -27,127 +27,96 @@ const ProductCards: React.FC<ProductCardsProps> = ({
         return (
           <div
             key={product.id}
-            className="bg-neutral-900 border border-neutral-800 rounded-lg p-3 sm:p-4 w-full"
+            className="bg-neutral-900/40 border border-neutral-800/50 rounded-xl p-3"
           >
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-2">
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-neutral-200 truncate">
+                <h3 className="font-medium text-white text-sm truncate">
                   {product.nombre}
                 </h3>
                 {product.descripcion && (
-                  <p className="text-xs sm:text-sm text-neutral-500 mt-1 truncate">
+                  <p className="text-[11px] text-neutral-600 mt-0.5 truncate">
                     {product.descripcion}
                   </p>
                 )}
               </div>
               <span
-                className={`ml-2 inline-flex items-center px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium ${
+                className={`ml-2 px-2 py-0.5 rounded-md text-xs font-medium ${
                   product.stock === 0
-                    ? "bg-red-900/50 text-red-400"
+                    ? "bg-red-500/10 text-red-400"
                     : product.stock < 5
-                    ? "bg-yellow-900/50 text-yellow-400"
-                    : "bg-green-900/50 text-green-400"
+                    ? "bg-amber-500/10 text-amber-400"
+                    : "bg-emerald-500/10 text-emerald-400"
                 }`}
               >
                 {product.stock}
               </span>
             </div>
 
-            <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-neutral-500">Costo:</span>
-                  <span className="text-sm text-neutral-400">${product.precio_compra || 0}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-neutral-500">Venta:</span>
-                  <span className="text-base sm:text-lg font-bold text-green-400">${product.precio}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-neutral-500">Ganancia:</span>
-                  <span className={`text-sm font-semibold ${getGananciaColorClass(ganancia)}`}>
-                    ${ganancia.toFixed(2)}
-                    {margen !== null && <span className="text-xs text-neutral-500 ml-1">({margen.toFixed(0)}%)</span>}
-                  </span>
-                </div>
+            {/* Prices Grid */}
+            <div className="grid grid-cols-3 gap-2 mb-3 py-2 border-y border-neutral-800/30">
+              <div>
+                <p className="text-[10px] text-neutral-600">Costo</p>
+                <p className="text-sm text-neutral-500">${product.precio_compra || 0}</p>
               </div>
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div>
+                <p className="text-[10px] text-neutral-600">Precio</p>
+                <p className="text-sm text-emerald-400 font-medium">${product.precio}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-neutral-600">Ganancia</p>
+                <p className={`text-sm font-medium ${getGananciaColorClass(ganancia)}`}>
+                  ${ganancia.toFixed(0)}
+                  {margen !== null && <span className="text-[10px] text-neutral-600 ml-0.5">({margen.toFixed(0)}%)</span>}
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
                 {product.descripcion && (
                   <button
-                    onClick={() =>
-                      onOpenModal("Descripción", product.descripcion!)
-                    }
-                    className="p-1 sm:p-2 text-neutral-400 hover:text-blue-400 hover:bg-neutral-800 rounded-lg transition-colors"
+                    onClick={() => onOpenModal("Descripción", product.descripcion!)}
+                    className="p-1.5 text-neutral-600 hover:text-white hover:bg-neutral-800/50 rounded-lg transition-colors"
                   >
-                    <FileText size={16} />
+                    <FileText size={14} />
                   </button>
                 )}
                 {product.notas && (
                   <button
                     onClick={() => onOpenModal("Notas", product.notas!)}
-                    className="p-1 sm:p-2 text-neutral-400 hover:text-blue-400 hover:bg-neutral-800 rounded-lg transition-colors"
+                    className="p-1.5 text-neutral-600 hover:text-white hover:bg-neutral-800/50 rounded-lg transition-colors"
                   >
-                    <StickyNote size={16} />
+                    <StickyNote size={14} />
                   </button>
                 )}
               </div>
-            </div>
-
-            <div className="flex gap-2">
-              {isAdmin ? (
-                <>
+              
+              {isAdmin && (
+                <div className="flex gap-1.5">
                   <button
                     onClick={() => onEdit(product)}
-                    className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors flex items-center justify-center gap-1 sm:gap-2 text-sm"
+                    className="flex items-center gap-1 px-2.5 py-1.5 bg-neutral-800/50 hover:bg-neutral-700/50 text-neutral-300 rounded-lg transition-colors text-xs"
                   >
-                    <Edit2 size={14} />
+                    <Edit2 size={12} />
                     <span>Editar</span>
                   </button>
                   <button
                     onClick={() => onDelete(product.id)}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors flex items-center justify-center gap-1 sm:gap-2 text-sm"
+                    className="flex items-center gap-1 px-2.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors text-xs"
                   >
-                    <Trash2 size={14} />
-                    <span>Eliminar</span>
+                    <Trash2 size={12} />
                   </button>
-                </>
-              ) : (
-                <div className="flex-1 flex items-center justify-center text-neutral-500 p-2">
-                  <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-neutral-800 rounded-full">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      className="w-3 h-3 sm:w-4 sm:h-4 text-neutral-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="9"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                      <line
-                        x1="5"
-                        y1="5"
-                        x2="19"
-                        y2="19"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-              </div>
-            )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
         );
       })}
       {products.length === 0 && (
-        <div className="text-center py-12 text-neutral-500">
+        <div className="text-center py-12 text-neutral-600 text-sm">
           No se encontraron productos
         </div>
       )}

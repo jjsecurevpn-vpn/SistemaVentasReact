@@ -192,28 +192,28 @@ const PromoFormModal: React.FC<PromoFormModalProps> = ({
   return (
     <>
       <Modal isOpen={isOpen} onClose={closeAndReset} title="Nueva promoción" size="lg">
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
         {error && (
-          <div className="bg-red-900/20 border border-red-700/40 text-red-300 text-sm px-3 py-2 rounded-lg">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs px-3 py-2 rounded-lg">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
               Nombre
             </label>
             <input
               type="text"
               value={form.nombre}
               onChange={(e) => setForm((prev) => ({ ...prev, nombre: e.target.value }))}
-              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
               placeholder="Ej: Combo Vino + Gaseosa"
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
               Precio promocional
             </label>
             <input
@@ -222,64 +222,64 @@ const PromoFormModal: React.FC<PromoFormModalProps> = ({
               step="0.01"
               value={form.precio_promocional}
               onChange={(e) => setForm((prev) => ({ ...prev, precio_promocional: e.target.value }))}
-              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
               placeholder="0.00"
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
               Vigencia (desde)
             </label>
             <input
               type="date"
               value={form.fecha_inicio}
               onChange={(e) => setForm((prev) => ({ ...prev, fecha_inicio: e.target.value }))}
-              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
               Vigencia (hasta)
             </label>
             <input
               type="date"
               value={form.fecha_fin}
               onChange={(e) => setForm((prev) => ({ ...prev, fecha_fin: e.target.value }))}
-              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-              Límite de uso (opcional)
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
+              Límite de uso
             </label>
             <input
               type="number"
               min="1"
               value={form.limite_uso}
               onChange={(e) => setForm((prev) => ({ ...prev, limite_uso: e.target.value }))}
-              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
               placeholder="Ilimitado"
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-              Notas internas
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
+              Notas
             </label>
             <input
               type="text"
               value={form.notas}
               onChange={(e) => setForm((prev) => ({ ...prev, notas: e.target.value }))}
-              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-              placeholder="Observaciones para el equipo"
+              className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
+              placeholder="Opcional"
             />
           </div>
         </div>
 
-        <div className="space-y-3">
-          <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+        <div className="space-y-2">
+          <label className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
             Productos incluidos
           </label>
-          <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-48 overflow-y-auto">
             {items.map((item, index) => {
               const selectedProduct = item.producto_id
                 ? products.find((p) => p.id === item.producto_id)
@@ -288,59 +288,34 @@ const PromoFormModal: React.FC<PromoFormModalProps> = ({
               return (
                 <div
                   key={`promo-item-${index}`}
-                  className="grid grid-cols-12 gap-2 items-start"
+                  className="flex items-center gap-2"
                 >
-                  <div className="col-span-7">
-                    <span className="text-[11px] text-neutral-500 uppercase font-semibold">
-                      Producto
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenPicker(index)}
-                      className="mt-1 w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-left text-sm text-neutral-100 hover:border-emerald-500/40"
-                    >
-                      {selectedProduct ? (
-                        <div>
-                          <p className="font-medium text-neutral-100">
-                            {selectedProduct.nombre}
-                          </p>
-                          <p className="text-[11px] text-neutral-500">
-                            Stock: {selectedProduct.stock} · Precio: ${" "}
-                            {selectedProduct.precio.toFixed(2)}
-                          </p>
-                        </div>
-                      ) : (
-                        <span className="text-neutral-500">Buscar producto</span>
-                      )}
-                    </button>
-                    {!selectedProduct && (
-                      <p className="text-[11px] text-neutral-500 mt-1">
-                        Selecciona un producto para este combo
-                      </p>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenPicker(index)}
+                    className="flex-1 px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-left text-sm hover:border-neutral-700 transition-colors"
+                  >
+                    {selectedProduct ? (
+                      <span className="text-white">{selectedProduct.nombre}</span>
+                    ) : (
+                      <span className="text-neutral-600">Seleccionar producto</span>
                     )}
-                  </div>
-                  <div className="col-span-3">
-                    <span className="text-[11px] text-neutral-500 uppercase font-semibold">
-                      Cantidad
-                    </span>
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.cantidad}
-                      onChange={(e) => handleQuantityChange(index, e.target.value)}
-                      className="mt-1 w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                    />
-                  </div>
-                  <div className="col-span-2 flex justify-end items-center">
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveRow(index)}
-                      className="px-2 py-2 text-xs text-red-400 hover:text-red-300"
-                      disabled={items.length === 1}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.cantidad}
+                    onChange={(e) => handleQuantityChange(index, e.target.value)}
+                    className="w-16 px-2 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-sm text-white text-center focus:outline-none focus:border-neutral-700 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRow(index)}
+                    className="p-2 text-neutral-600 hover:text-red-400 transition-colors"
+                    disabled={items.length === 1}
+                  >
+                    ×
+                  </button>
                 </div>
               );
             })}
@@ -348,49 +323,49 @@ const PromoFormModal: React.FC<PromoFormModalProps> = ({
           <button
             type="button"
             onClick={handleAddRow}
-            className="text-sm text-emerald-300 hover:text-emerald-200"
+            className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
           >
             + Agregar producto
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-neutral-900/60 border border-neutral-800 rounded-xl p-4">
+        <div className="grid grid-cols-3 gap-2 bg-neutral-900/40 border border-neutral-800/50 rounded-xl p-3">
           <div>
-            <p className="text-xs text-neutral-500 uppercase">Precio normal</p>
-            <p className="text-lg font-semibold text-neutral-100">
-              ${summary.precioNormal.toFixed(2)}
+            <p className="text-[10px] text-neutral-600 uppercase">Normal</p>
+            <p className="text-sm font-medium text-white">
+              ${summary.precioNormal.toFixed(0)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-neutral-500 uppercase">Costo estimado</p>
-            <p className="text-lg font-semibold text-neutral-100">
-              ${summary.costoTotal.toFixed(2)}
+            <p className="text-[10px] text-neutral-600 uppercase">Costo</p>
+            <p className="text-sm font-medium text-white">
+              ${summary.costoTotal.toFixed(0)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-neutral-500 uppercase">Margen esperado</p>
-            <p className="text-lg font-semibold text-emerald-400">
+            <p className="text-[10px] text-neutral-600 uppercase">Margen</p>
+            <p className="text-sm font-medium text-emerald-400">
               ${(
                 (parseFloat(form.precio_promocional) || 0) - summary.costoTotal
-              ).toFixed(2)}
+              ).toFixed(0)}
             </p>
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-2">
+        <div className="flex gap-2 pt-2">
           <button
             type="button"
             onClick={closeAndReset}
-            className="px-4 py-2 rounded-lg border border-neutral-700 text-neutral-300 text-sm hover:bg-neutral-800"
+            className="px-4 py-2 text-sm text-neutral-400 hover:text-white transition-colors"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-500 disabled:opacity-60"
+            className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 disabled:opacity-50 transition-colors"
           >
-            {submitting ? "Creando..." : "Guardar Promo"}
+            {submitting ? "Creando..." : "Crear promoción"}
           </button>
         </div>
       </form>
@@ -402,31 +377,26 @@ const PromoFormModal: React.FC<PromoFormModalProps> = ({
         title="Seleccionar producto"
         size="md"
       >
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-              Busca por nombre
-            </label>
-            <input
-              type="text"
-              autoFocus
-              value={pickerSearch}
-              onChange={(e) => handlePickerSearchChange(e.target.value)}
-              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-              placeholder="Ej: Coca, Galletas, Vodka..."
-            />
-          </div>
+        <div className="space-y-3">
+          <input
+            type="text"
+            autoFocus
+            value={pickerSearch}
+            onChange={(e) => handlePickerSearchChange(e.target.value)}
+            className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
+            placeholder="Buscar producto..."
+          />
 
-          <div className="max-h-72 overflow-y-auto divide-y divide-neutral-900 border border-neutral-800 rounded-lg">
+          <div className="max-h-64 overflow-y-auto divide-y divide-neutral-800/30 border border-neutral-800/50 rounded-xl">
             {pickerSearch.trim().length === 0 && (
-              <p className="px-4 py-6 text-sm text-neutral-500 text-center">
-                Escribe al menos una palabra para comenzar la búsqueda
+              <p className="px-4 py-6 text-xs text-neutral-600 text-center">
+                Escribe para buscar
               </p>
             )}
 
             {pickerSearch.trim().length > 0 && filteredProducts.length === 0 && (
-              <p className="px-4 py-6 text-sm text-neutral-500 text-center">
-                No se encontraron productos que coincidan con "{pickerSearch}"
+              <p className="px-4 py-6 text-xs text-neutral-600 text-center">
+                Sin resultados para "{pickerSearch}"
               </p>
             )}
 
@@ -439,17 +409,16 @@ const PromoFormModal: React.FC<PromoFormModalProps> = ({
                   type="button"
                   key={product.id}
                   onClick={() => handleSelectProduct(product)}
-                  className="w-full text-left px-4 py-3 hover:bg-neutral-800">
+                  className="w-full text-left px-3 py-2.5 hover:bg-neutral-800/30 transition-colors">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="font-medium text-neutral-100">{product.nombre}</p>
-                    <span className="text-xs text-neutral-400">
-                      Stock: {product.stock}
+                    <p className="text-sm text-white">{product.nombre}</p>
+                    <span className="text-[10px] text-neutral-600">
+                      {product.stock} uds
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-500 mt-1">
-                    Precio: ${product.precio.toFixed(2)} · Costo: $
-                    {product.precio_compra ? product.precio_compra.toFixed(2) : "-"}
-                    {alreadyUsed ? " · Ya agregado en la promo" : ""}
+                  <p className="text-[10px] text-neutral-600 mt-0.5">
+                    ${product.precio.toFixed(0)}
+                    {alreadyUsed && <span className="text-amber-500 ml-2">• Ya agregado</span>}
                   </p>
                 </button>
               );
@@ -459,9 +428,9 @@ const PromoFormModal: React.FC<PromoFormModalProps> = ({
           <button
             type="button"
             onClick={handleClosePicker}
-            className="w-full text-sm text-neutral-400 hover:text-neutral-200"
+            className="w-full text-xs text-neutral-500 hover:text-white transition-colors py-1"
           >
-            Cerrar buscador
+            Cerrar
           </button>
         </div>
       </Modal>

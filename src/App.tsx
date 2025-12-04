@@ -73,8 +73,11 @@ const AppContent: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#181818] flex items-center justify-center">
-        <div className="text-white">Cargando...</div>
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-700 border-t-neutral-400 mx-auto mb-3"></div>
+          <p className="text-neutral-500 text-sm">Cargando...</p>
+        </div>
       </div>
     );
   }
@@ -87,7 +90,7 @@ const AppContent: React.FC = () => {
   const CurrentComponent = currentScreenConfig.component;
 
   return (
-    <div className="h-screen bg-dark-bg flex overflow-hidden w-full">
+    <div className="h-screen bg-[#0a0a0a] flex overflow-hidden w-full">
       <Sidebar
         currentScreen={currentScreen}
         onScreenChange={(screen: string) => setCurrentScreen(screen as ScreenKey)}
@@ -95,7 +98,7 @@ const AppContent: React.FC = () => {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col bg-[#181818] md:ml-14 overflow-x-hidden w-full">
+      <div className="flex-1 flex flex-col bg-[#0a0a0a] md:ml-14 overflow-x-hidden w-full">
         <Header
           title={currentScreenConfig.title}
           onMenuClick={toggleSidebar}

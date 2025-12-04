@@ -87,9 +87,9 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ isOpen, onClose, cliente, onS
       onClose={onClose}
       title={cliente ? 'Editar Cliente' : 'Nuevo Cliente'}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-neutral-500 mb-1.5">
             Nombre *
           </label>
           <input
@@ -98,12 +98,12 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ isOpen, onClose, cliente, onS
             value={formData.nombre}
             onChange={handleChange}
             required
-            className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+            className="w-full bg-neutral-900/60 border border-neutral-800/50 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-neutral-500 mb-1.5">
             Teléfono
           </label>
           <input
@@ -111,12 +111,12 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ isOpen, onClose, cliente, onS
             name="telefono"
             value={formData.telefono || ''}
             onChange={handleChange}
-            className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+            className="w-full bg-neutral-900/60 border border-neutral-800/50 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-neutral-500 mb-1.5">
             Email
           </label>
           <input
@@ -124,12 +124,12 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ isOpen, onClose, cliente, onS
             name="email"
             value={formData.email || ''}
             onChange={handleChange}
-            className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+            className="w-full bg-neutral-900/60 border border-neutral-800/50 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-neutral-500 mb-1.5">
             Dirección
           </label>
           <input
@@ -137,36 +137,36 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ isOpen, onClose, cliente, onS
             name="direccion"
             value={formData.direccion || ''}
             onChange={handleChange}
-            className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+            className="w-full bg-neutral-900/60 border border-neutral-800/50 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-neutral-500 mb-1.5">
             Notas
           </label>
           <textarea
             name="notas"
             value={formData.notas || ''}
             onChange={handleChange}
-            rows={3}
-            className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+            rows={2}
+            className="w-full bg-neutral-900/60 border border-neutral-800/50 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-700 transition-colors resize-none"
           />
         </div>
 
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="flex gap-2 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm text-neutral-400 hover:text-white transition-colors"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="flex-1 px-4 py-2 bg-white text-black text-sm font-medium rounded-lg hover:bg-neutral-200 transition-colors"
           >
-            {cliente ? 'Guardar Cambios' : 'Crear Cliente'}
+            {cliente ? 'Guardar' : 'Crear cliente'}
           </button>
         </div>
       </form>

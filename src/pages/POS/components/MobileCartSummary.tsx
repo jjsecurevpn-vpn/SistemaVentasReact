@@ -35,44 +35,33 @@ const MobileCartSummary: React.FC<MobileCartSummaryProps> = ({
   onConfirmSale,
 }) => (
   <>
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-20 max-h-[60vh] flex flex-col">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0a0a0a] border-t border-neutral-800/50 z-20 max-h-[65vh] flex flex-col">
+      {/* Cart Items */}
       {cart.length > 0 && (
-        <div className="overflow-auto max-h-48 border-b border-neutral-800">
+        <div className="overflow-auto max-h-40 border-b border-neutral-800/30">
           <div className="p-3 space-y-2">
             {cart.map((item, index) => (
-              <div key={index} className="bg-[#181818] border border-neutral-800 rounded-lg p-2">
+              <div key={index} className="bg-neutral-900/40 border border-neutral-800/50 rounded-lg p-2.5">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0 pr-2">
                     {item.type === "promo" && (
-                      <span className="inline-flex items-center text-[10px] px-2 py-0.5 rounded-full border border-emerald-600/40 bg-emerald-600/10 text-emerald-300 mb-0.5">
+                      <span className="inline-block text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-0.5">
                         Promo
                       </span>
                     )}
-                    <p className="font-medium text-neutral-200 text-xs truncate">
+                    <p className="font-medium text-white text-xs truncate">
                       {item.type === "promo" ? item.promo.nombre : item.product.nombre}
                     </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-neutral-400">
-                        ×{item.quantity} {item.type === "promo" ? "promo(s)" : "unidad(es)"}
-                      </span>
-                      <span className="text-xs text-green-400 font-semibold">${item.subtotal.toFixed(2)}</span>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-[10px] text-neutral-500">×{item.quantity}</span>
+                      <span className="text-xs text-emerald-400 font-medium">${item.subtotal.toFixed(2)}</span>
                     </div>
-                    {item.type === "promo" && (
-                      <p className="text-[10px] text-neutral-500 mt-0.5">
-                        {item.promo.promo_productos
-                          ?.map(
-                            (pp) =>
-                              `×${pp.cantidad * item.quantity} ${pp.producto?.nombre || "Producto"}`
-                          )
-                          .join(" • ")}
-                      </p>
-                    )}
                   </div>
                   <button
                     onClick={() => onRemoveItem(index)}
-                    className="p-1 hover:bg-red-900/30 text-red-400 rounded transition-colors flex-shrink-0"
+                    className="p-1 hover:bg-red-500/10 text-neutral-500 hover:text-red-400 rounded transition-colors flex-shrink-0"
                   >
-                    <X size={14} />
+                    <X size={12} />
                   </button>
                 </div>
               </div>
@@ -81,88 +70,85 @@ const MobileCartSummary: React.FC<MobileCartSummaryProps> = ({
         </div>
       )}
 
-      <div className="p-3 flex-shrink-0">
-        <div className="flex items-center justify-between mb-2">
+      {/* Controls */}
+      <div className="p-3 flex-shrink-0 space-y-2.5">
+        {/* Total */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShoppingCart size={18} className="text-neutral-400" />
-            <span className="text-sm text-neutral-400">{cart.length} items</span>
+            <ShoppingCart size={14} className="text-neutral-500" />
+            <span className="text-xs text-neutral-500">{cart.length} items</span>
           </div>
-          <span className="text-xl font-bold text-green-400">${total.toFixed(2)}</span>
+          <span className="text-lg font-semibold text-white">${total.toFixed(2)}</span>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-2">
+        {/* Payment Type */}
+        <div className="grid grid-cols-2 gap-2">
           <button
-            onClick={() => {
-              onVentaAlFiadoChange(false);
-            }}
-            className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded text-xs font-medium transition-all ${
-              !ventaAlFiado ? "bg-blue-600 text-white" : "bg-neutral-800 text-neutral-400"
+            onClick={() => onVentaAlFiadoChange(false)}
+            className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${
+              !ventaAlFiado ? "bg-white text-black" : "bg-neutral-800/50 text-neutral-500"
             }`}
           >
-            <Banknote size={14} />
+            <Banknote size={12} />
             Contado
           </button>
           <button
             onClick={() => onVentaAlFiadoChange(true)}
-            className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded text-xs font-medium transition-all ${
-              ventaAlFiado ? "bg-yellow-600 text-white" : "bg-neutral-800 text-neutral-400"
+            className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${
+              ventaAlFiado ? "bg-amber-500 text-black" : "bg-neutral-800/50 text-neutral-500"
             }`}
           >
-            <CreditCard size={14} />
+            <CreditCard size={12} />
             Fiado
           </button>
         </div>
 
-        {ventaAlFiado && (
-          <div className="mb-2">
-            <button
-              onClick={onOpenClienteModal}
-              className="w-full flex items-center justify-between px-2 py-1.5 bg-neutral-800 border border-neutral-700 text-neutral-200 rounded text-xs"
-            >
-              <span className={clienteSeleccionado ? "text-neutral-200" : "text-neutral-500"}>
-                {clienteSeleccionado
-                  ? `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido || ""}`
-                  : "Cliente..."}
-              </span>
-              <ChevronDown size={14} />
-            </button>
-          </div>
+        {/* Client Selector or Payment Method */}
+        {ventaAlFiado ? (
+          <button
+            onClick={onOpenClienteModal}
+            className="w-full flex items-center justify-between px-3 py-2 bg-neutral-900/50 border border-neutral-800 text-white rounded-lg text-xs"
+          >
+            <span className={clienteSeleccionado ? "text-white" : "text-neutral-500"}>
+              {clienteSeleccionado
+                ? `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido || ""}`
+                : "Seleccionar cliente..."}
+            </span>
+            <ChevronDown size={12} className="text-neutral-500" />
+          </button>
+        ) : (
+          <select
+            value={metodoPago}
+            onChange={(e) => onMetodoPagoChange(e.target.value)}
+            className="w-full px-3 py-2 bg-neutral-900/50 border border-neutral-800 text-white text-xs rounded-lg focus:outline-none focus:border-neutral-600"
+          >
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+          </select>
         )}
 
-        {!ventaAlFiado && (
-          <div className="mb-2">
-            <select
-              value={metodoPago}
-              onChange={(e) => onMetodoPagoChange(e.target.value)}
-              className="w-full px-2 py-1.5 bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="efectivo">Efectivo</option>
-              <option value="transferencia">Transferencia</option>
-            </select>
-          </div>
-        )}
+        {/* Notes */}
+        <textarea
+          value={ventaNotas}
+          onChange={(e) => onNotasChange(e.target.value)}
+          placeholder="Notas (opcional)"
+          rows={2}
+          className="w-full px-3 py-2 bg-neutral-900/50 border border-neutral-800 text-white text-xs rounded-lg resize-none focus:outline-none focus:border-neutral-600 placeholder-neutral-600"
+        />
 
-        <div className="mb-2">
-          <textarea
-            value={ventaNotas}
-            onChange={(e) => onNotasChange(e.target.value)}
-            placeholder="Comentarios..."
-            rows={2}
-            className="w-full px-2 py-1.5 bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
+        {/* Confirm Button */}
         <button
           onClick={onConfirmSale}
           disabled={cart.length === 0 || saleLoading}
-          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-neutral-700 text-white py-2.5 rounded-lg font-semibold text-sm transition-colors disabled:cursor-not-allowed"
+          className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:bg-neutral-800 disabled:text-neutral-600 text-black py-3 rounded-lg font-medium text-sm transition-colors disabled:cursor-not-allowed"
         >
           {saleLoading ? "Procesando..." : "Confirmar Venta"}
         </button>
       </div>
     </div>
 
-    <div className="md:hidden h-32" />
+    {/* Spacer for content */}
+    <div className="md:hidden h-36" />
   </>
 );
 

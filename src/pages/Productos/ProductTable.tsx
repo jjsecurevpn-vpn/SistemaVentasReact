@@ -19,35 +19,35 @@ const ProductTable: React.FC<ProductTableProps> = ({
   onOpenModal,
 }) => {
   return (
-    <div className="hidden md:block bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden w-full box-border">
-      <div className="overflow-x-auto w-full box-border">
-        <table className="w-full border-collapse box-border">
-          <thead className="bg-neutral-800/50 border-b border-neutral-800">
-            <tr>
-              <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+    <div className="hidden md:block bg-neutral-900/40 border border-neutral-800/50 rounded-xl overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-neutral-800/50">
+              <th className="px-4 py-3 text-left text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
                 Producto
               </th>
-              <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
                 Costo
               </th>
-              <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
                 Precio
               </th>
-              <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
                 Ganancia
               </th>
-              <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
                 Stock
               </th>
-              <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
                 Info
               </th>
-              <th className="px-4 sm:px-6 py-3 sm:py-4 text-right text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              <th className="px-4 py-3 text-right text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-neutral-800/30">
             {products.map((product) => {
               const ganancia = calcularGanancia(product.precio, product.precio_compra);
               const margen = calcularMargen(product.precio, product.precio_compra);
@@ -55,64 +55,64 @@ const ProductTable: React.FC<ProductTableProps> = ({
               return (
                 <tr
                   key={product.id}
-                  className="hover:bg-neutral-800/30 border-b border-neutral-800"
+                  className="hover:bg-neutral-800/20 transition-colors"
                 >
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
-                    <div className="font-medium text-neutral-200 truncate">
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-white text-sm truncate">
                       {product.nombre}
                     </div>
                     {product.descripcion && (
-                      <div className="text-sm text-neutral-500 mt-1 truncate max-w-xs">
+                      <div className="text-xs text-neutral-600 mt-0.5 truncate max-w-xs">
                         {product.descripcion}
                       </div>
                     )}
                   </td>
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
-                    <span className="text-neutral-400">
+                  <td className="px-4 py-3">
+                    <span className="text-neutral-500 text-sm">
                       ${product.precio_compra || 0}
                     </span>
                   </td>
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
-                    <span className="text-green-400 font-semibold">
+                  <td className="px-4 py-3">
+                    <span className="text-emerald-400 font-medium text-sm">
                       ${product.precio}
                     </span>
                   </td>
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
+                  <td className="px-4 py-3">
                     <div className="flex flex-col">
-                      <span className={`font-semibold ${getGananciaColorClass(ganancia)}`}>
+                      <span className={`font-medium text-sm ${getGananciaColorClass(ganancia)}`}>
                         ${ganancia.toFixed(2)}
                       </span>
                       {margen !== null && (
-                        <span className="text-xs text-neutral-500">
-                          {margen.toFixed(0)}% margen
+                        <span className="text-[10px] text-neutral-600">
+                          {margen.toFixed(0)}%
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
+                  <td className="px-4 py-3">
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium ${
+                      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
                         product.stock === 0
-                          ? "bg-red-900/50 text-red-400"
+                          ? "bg-red-500/10 text-red-400"
                           : product.stock < 5
-                          ? "bg-yellow-900/50 text-yellow-400"
-                          : "bg-green-900/50 text-green-400"
+                          ? "bg-amber-500/10 text-amber-400"
+                          : "bg-emerald-500/10 text-emerald-400"
                       }`}
                     >
-                      {product.stock} unidades
+                      {product.stock}
                     </span>
                   </td>
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
-                    <div className="flex items-center gap-2">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1.5">
                       {product.descripcion && (
                         <button
                           onClick={() =>
                             onOpenModal("Descripción", product.descripcion!)
                           }
-                          className="text-neutral-400 hover:text-blue-400"
+                          className="p-1.5 text-neutral-600 hover:text-white hover:bg-neutral-800/50 rounded-lg transition-colors"
                           title="Ver descripción"
                         >
-                          <FileText size={16} />
+                          <FileText size={14} />
                         </button>
                       )}
                       {product.notas && (
@@ -120,66 +120,35 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           onClick={() =>
                             onOpenModal("Notas", product.notas!)
                           }
-                          className="text-neutral-400 hover:text-blue-400"
+                          className="p-1.5 text-neutral-600 hover:text-white hover:bg-neutral-800/50 rounded-lg transition-colors"
                           title="Ver notas"
                         >
-                          <StickyNote size={16} />
+                          <StickyNote size={14} />
                         </button>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
                       {isAdmin ? (
                         <>
                           <button
                             onClick={() => onEdit(product)}
-                            className="p-1 sm:p-2 text-neutral-400 hover:text-blue-400 hover:bg-neutral-800 rounded-lg"
+                            className="p-1.5 text-neutral-600 hover:text-white hover:bg-neutral-800/50 rounded-lg transition-colors"
                             title="Editar"
                           >
-                            <Edit2 size={16} />
+                            <Edit2 size={14} />
                           </button>
                           <button
                             onClick={() => onDelete(product.id)}
-                            className="p-1 sm:p-2 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-lg"
+                            className="p-1.5 text-neutral-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                             title="Eliminar"
                           >
-                            <Trash2 size={16} />
+                            <Trash2 size={14} />
                           </button>
                         </>
                       ) : (
-                        <div
-                          title="Sin permisos"
-                          className="text-neutral-500 p-1 sm:p-2"
-                        >
-                          <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-neutral-800 rounded-full">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              className="w-3 h-3 sm:w-4 sm:h-4 text-neutral-400"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="9"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              />
-                              <line
-                                x1="5"
-                                y1="5"
-                                x2="19"
-                                y2="19"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                              />
-                            </svg>
-                          </span>
-                        </div>
+                        <span className="text-neutral-700 text-xs">—</span>
                       )}
                     </div>
                   </td>
@@ -190,7 +159,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </table>
       </div>
       {products.length === 0 && (
-        <div className="text-center py-12 text-neutral-500">
+        <div className="text-center py-12 text-neutral-600 text-sm">
           No se encontraron productos
         </div>
       )}

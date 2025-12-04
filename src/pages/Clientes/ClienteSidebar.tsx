@@ -22,24 +22,17 @@ const ClienteSidebar: React.FC<ClienteSidebarProps> = ({
 }) => {
   const { isAdmin } = useAuth();
   return (
-    <div className="hidden md:flex md:w-80 md:border-r md:border-neutral-800 md:flex-col">
-      <div className="p-4 border-b border-neutral-800 flex justify-between items-center">
+    <div className="hidden md:flex md:w-72 md:border-r md:border-neutral-800/50 md:flex-col bg-[#0a0a0a]">
+      <div className="p-4 border-b border-neutral-800/50 flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold text-neutral-200">Clientes</h2>
-          <p className="text-sm text-neutral-500">{clientes.length} clientes</p>
+          <h2 className="text-sm font-medium text-white">Clientes</h2>
+          <p className="text-xs text-neutral-600">{clientes.length} registrados</p>
         </div>
         <button
           onClick={onAddCliente}
-          className="flex items-center gap-2 rounded-md border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm font-medium text-gray-200 hover:border-neutral-500 hover:bg-neutral-800 transition"
+          className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-black hover:bg-neutral-200 transition-colors"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
           Nuevo
@@ -48,39 +41,41 @@ const ClienteSidebar: React.FC<ClienteSidebarProps> = ({
 
       <div className="flex-1 overflow-y-auto">
         {clientes.map((cliente) => {
+          const isSelected = selectedCliente?.id === cliente.id;
           return (
             <div
               key={cliente.id}
               onClick={() => onSelectCliente(cliente)}
-              className={`p-4 border-b border-neutral-800 hover:bg-neutral-800 transition-colors flex justify-between items-start cursor-pointer ${
-                selectedCliente?.id === cliente.id ? 'text-neutral-200 bg-neutral-800 border-l-4 border-blue-500' : 'text-neutral-500'
+              className={`px-4 py-3 border-b border-neutral-800/30 hover:bg-neutral-800/30 transition-colors flex justify-between items-start cursor-pointer ${
+                isSelected ? 'bg-neutral-800/40 border-l-2 border-l-white' : ''
               }`}
             >
-              <div className="flex-1">
-                <h3 className="font-medium">{cliente.nombre}</h3>
+              <div className="flex-1 min-w-0">
+                <h3 className={`text-sm truncate ${isSelected ? 'text-white font-medium' : 'text-neutral-400'}`}>
+                  {cliente.nombre}
+                </h3>
                 {cliente.telefono && (
-                  <p className="text-sm text-neutral-400">{cliente.telefono}</p>
+                  <p className="text-xs text-neutral-600 truncate">{cliente.telefono}</p>
                 )}
               </div>
-              <div className="flex flex-col items-end gap-2">
+              <div className="flex flex-col items-end gap-1 ml-2">
                 {cliente.deuda && cliente.deuda > 0 && (
-                  <div className="text-right mb-2">
-                    <p className="text-sm font-medium text-red-400">{formatCurrency(cliente.deuda)}</p>
-                    <p className="text-xs text-neutral-500">deuda</p>
-                  </div>
+                  <span className="text-xs font-medium text-red-400">
+                    {formatCurrency(cliente.deuda)}
+                  </span>
                 )}
                 {isAdmin && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100">
                     <button
                       onClick={(e) => { e.stopPropagation(); onEditCliente(cliente); }}
-                      className="p-1 text-gray-400 hover:text-white transition-colors"
+                      className="p-1 text-neutral-600 hover:text-white transition-colors text-xs"
                       title="Editar"
                     >
                       ✎
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); onDeleteCliente(cliente); }}
-                      className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                      className="p-1 text-neutral-600 hover:text-red-400 transition-colors text-xs"
                       title="Eliminar"
                     >
                       ×

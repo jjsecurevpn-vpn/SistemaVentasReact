@@ -11,7 +11,7 @@ import CajaMovementsList from './CajaMovementsList';
 import CajaMovementForm from './CajaMovementForm';
 import CajaDeleteModal from './CajaDeleteModal';
 import CajaMovementDetailsModal from './CajaMovementDetailsModal';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Movimiento {
   id: number;
@@ -808,60 +808,56 @@ const Caja: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-neutral-400">Cargando...</div>
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-neutral-700 border-t-white rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-6">
+    <div className="min-h-screen bg-[#0a0a0a] p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         <CajaHeader
           isAdmin={isAdmin}
           onNewMovement={handleNewMovement}
         />
 
-        {/* Selector de Mes - Profesional y Centrado */}
-        <div className="mb-6 flex justify-center w-full box-border">
-          <div className="w-full max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg bg-gradient-to-br from-emerald-500/15 to-emerald-600/10 border border-emerald-500/30 rounded-xl px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-8 hover:border-emerald-500/40 transition-all shadow-lg">
-            <div className="flex items-center justify-between gap-4 sm:gap-6">
+        {/* Selector de Mes */}
+        <div className="mb-6 flex justify-center">
+          <div className="bg-neutral-900/40 border border-neutral-800/50 rounded-xl px-4 py-3 sm:px-6 sm:py-4">
+            <div className="flex items-center gap-4 sm:gap-6">
               <button
                 onClick={handleMesAnterior}
-                className="p-2 sm:p-3 hover:bg-emerald-500/25 rounded-lg transition-colors flex-shrink-0"
+                className="p-1.5 hover:bg-neutral-800 rounded-lg transition-colors"
                 title="Mes anterior"
               >
-                <ChevronLeft size={24} className="sm:w-7 sm:h-7 text-emerald-400" />
+                <ChevronLeft size={20} className="text-neutral-400" />
               </button>
 
-              <div className="text-center flex-1 min-w-0">
-                <div className="flex items-center justify-center gap-2 mb-1 sm:mb-2 md:mb-3">
-                  <Calendar size={18} className="sm:w-5.5 sm:h-5.5 md:w-5.5 md:h-5.5 text-emerald-400" />
-                  <p className="text-xs font-semibold text-emerald-400/80 tracking-wide">PERIODO</p>
-                </div>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-emerald-400 mb-1 truncate">
-                  {meses[mes - 1]}
+              <div className="text-center min-w-[140px]">
+                <p className="text-[10px] font-medium text-neutral-600 uppercase tracking-wider mb-0.5">Periodo</p>
+                <p className="text-lg font-semibold text-white">
+                  {meses[mes - 1]} {año}
                 </p>
-                <p className="text-sm sm:text-base md:text-lg text-emerald-400/70 font-medium">{año}</p>
               </div>
 
               <button
                 onClick={handleMesSiguiente}
-                className="p-2 sm:p-3 hover:bg-emerald-500/25 rounded-lg transition-colors flex-shrink-0"
+                className="p-1.5 hover:bg-neutral-800 rounded-lg transition-colors"
                 title="Mes siguiente"
               >
-                <ChevronRight size={24} className="sm:w-7 sm:h-7 text-emerald-400" />
+                <ChevronRight size={20} className="text-neutral-400" />
               </button>
-            </div>
 
-            {!isCurrentMonth && (
-              <button
-                onClick={handleMesActual}
-                className="w-full mt-4 sm:mt-5 px-4 py-2 sm:py-3 bg-gradient-to-r from-emerald-500/40 to-emerald-600/30 hover:from-emerald-500/50 hover:to-emerald-600/40 text-emerald-300 font-semibold rounded-lg transition-all text-sm"
-              >
-                Volver a Hoy
-              </button>
-            )}
+              {!isCurrentMonth && (
+                <button
+                  onClick={handleMesActual}
+                  className="px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+                >
+                  Hoy
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

@@ -295,11 +295,11 @@ const Productos: React.FC = () => {
   }, [search, stockFilter]);
 
   return (
-    <div className="min-h-screen bg-[#181818] flex flex-col overflow-x-hidden w-full">
-      <div className="flex-1 w-full p-4 sm:p-6 md:p-8 lg:max-w-7xl xl:max-w-[1800px] mx-auto max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col overflow-x-hidden w-full">
+      <div className="flex-1 w-full px-4 py-6 sm:px-6 lg:px-8 lg:py-8 max-w-7xl mx-auto">
         {/* Error Message */}
         {error && (
-          <div className="mb-6 bg-red-900/20 border border-red-800/50 text-red-400 px-4 py-3 rounded-lg">
+          <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
@@ -332,8 +332,8 @@ const Productos: React.FC = () => {
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-neutral-400">Cargando productos...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-700 border-t-neutral-400 mx-auto mb-3"></div>
+              <p className="text-neutral-600 text-sm">Cargando productos...</p>
             </div>
           </div>
         ) : (
@@ -355,11 +355,11 @@ const Productos: React.FC = () => {
 
             {/* Paginación */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-8 flex-wrap">
+              <div className="flex justify-center items-center gap-1.5 mt-8 flex-wrap">
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 text-sm rounded bg-neutral-800 text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-700 transition"
+                  className="px-3 py-1.5 text-xs rounded-lg bg-neutral-900/50 border border-neutral-800/50 text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-800/50 hover:border-neutral-700/50 transition-colors"
                 >
                   ‹ Anterior
                 </button>
@@ -371,10 +371,10 @@ const Productos: React.FC = () => {
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`px-3 py-1.5 text-sm rounded transition ${
+                      className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
                         currentPage === pageNum
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'
+                          ? 'bg-white text-black font-medium'
+                          : 'bg-neutral-900/50 border border-neutral-800/50 hover:bg-neutral-800/50 text-neutral-400'
                       }`}
                     >
                       {pageNum}
@@ -385,7 +385,7 @@ const Productos: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1.5 text-sm rounded bg-neutral-800 text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-700 transition"
+                  className="px-3 py-1.5 text-xs rounded-lg bg-neutral-900/50 border border-neutral-800/50 text-neutral-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-800/50 hover:border-neutral-700/50 transition-colors"
                 >
                   Siguiente ›
                 </button>
@@ -394,23 +394,23 @@ const Productos: React.FC = () => {
           </>
         )}
 
-        <div className="mt-12">
+        <div className="mt-10 pt-8 border-t border-neutral-800/50">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-semibold text-neutral-100">Promociones</h2>
-              <p className="text-sm text-neutral-400">
-                Combos inteligentes para acelerar las ventas
+              <h2 className="text-lg font-medium text-white">Promociones</h2>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                Combos para acelerar ventas
               </p>
             </div>
             <button
               onClick={openPromoModal}
-              className="px-4 py-2 text-sm rounded-lg border border-emerald-600/60 text-emerald-300 hover:bg-emerald-600/10"
+              className="px-3 py-1.5 text-xs rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
             >
-              Crear promo
+              Nueva promo
             </button>
           </div>
           {promosError && (
-            <div className="mb-4 bg-red-900/20 border border-red-800/40 text-red-300 px-3 py-2 rounded-lg">
+            <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-2 rounded-lg text-xs">
               {promosError}
             </div>
           )}

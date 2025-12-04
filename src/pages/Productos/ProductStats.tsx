@@ -13,43 +13,21 @@ const ProductStats: React.FC<ProductStatsProps> = ({
   outOfStockCount,
   lowStockCount,
 }) => {
+  const stats = [
+    { label: "Valor inventario", value: `$${totalStockValue.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, color: "text-white" },
+    { label: "Total productos", value: totalProducts.toString(), color: "text-white" },
+    { label: "Sin stock", value: outOfStockCount.toString(), color: outOfStockCount > 0 ? "text-red-400" : "text-white" },
+    { label: "Stock bajo", value: lowStockCount.toString(), color: lowStockCount > 0 ? "text-amber-400" : "text-white" },
+  ];
+
   return (
-    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mb-6 w-full">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-3 sm:p-4 hover:border-neutral-700 transition-colors">
-        <div className="text-xs font-medium text-neutral-400 uppercase tracking-wide mb-1">
-          Valor Total
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6">
+      {stats.map((stat, i) => (
+        <div key={i} className="bg-neutral-900/40 border border-neutral-800/50 rounded-xl p-3">
+          <p className="text-[10px] text-neutral-500 uppercase tracking-wide mb-1">{stat.label}</p>
+          <p className={`text-lg font-semibold ${stat.color}`}>{stat.value}</p>
         </div>
-        <p className="text-lg sm:text-xl md:text-2xl font-bold text-neutral-200">
-          ${totalStockValue.toFixed(2)}
-        </p>
-      </div>
-
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-3 sm:p-4 hover:border-neutral-700 transition-colors">
-        <div className="text-xs font-medium text-neutral-400 uppercase tracking-wide mb-1">
-          Total Productos
-        </div>
-        <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-400">
-          {totalProducts}
-        </p>
-      </div>
-
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-3 sm:p-4 hover:border-neutral-700 transition-colors">
-        <div className="text-xs font-medium text-neutral-400 uppercase tracking-wide mb-1">
-          Sin Stock
-        </div>
-        <p className="text-lg sm:text-xl md:text-2xl font-bold text-red-400">
-          {outOfStockCount}
-        </p>
-      </div>
-
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-3 sm:p-4 hover:border-neutral-700 transition-colors">
-        <div className="text-xs font-medium text-neutral-400 uppercase tracking-wide mb-1">
-          Stock Bajo
-        </div>
-        <p className="text-lg sm:text-xl md:text-2xl font-bold text-yellow-400">
-          {lowStockCount}
-        </p>
-      </div>
+      ))}
     </div>
   );
 };

@@ -37,26 +37,29 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={isEditing ? "Editar Producto" : "Nuevo Producto"}
-      size="lg"
+      size="md"
     >
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={onSubmit} className="space-y-3">
+        {/* Nombre */}
+        <div>
+          <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider mb-1">
+            Nombre *
+          </label>
+          <input
+            type="text"
+            value={formData.nombre}
+            onChange={(e) =>
+              onFormDataChange({ ...formData, nombre: e.target.value })
+            }
+            className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors"
+            required
+          />
+        </div>
+
+        {/* Stock y Costo */}
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium mb-2 text-neutral-300">
-              Nombre *
-            </label>
-            <input
-              type="text"
-              value={formData.nombre}
-              onChange={(e) =>
-                onFormDataChange({ ...formData, nombre: e.target.value })
-              }
-              className="w-full bg-neutral-900 border border-neutral-800 text-neutral-200 p-3 rounded-lg placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2 text-neutral-300">
+            <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider mb-1">
               Stock *
             </label>
             <input
@@ -65,13 +68,13 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
               onChange={(e) =>
                 onFormDataChange({ ...formData, stock: e.target.value })
               }
-              className="w-full bg-neutral-900 border border-neutral-800 text-neutral-200 p-3 rounded-lg placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2 text-neutral-300">
-              Precio de Compra (Costo)
+            <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider mb-1">
+              Costo
             </label>
             <input
               type="number"
@@ -81,46 +84,49 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
               onChange={(e) =>
                 onFormDataChange({ ...formData, precio_compra: e.target.value })
               }
-              className="w-full bg-neutral-900 border border-neutral-800 text-neutral-200 p-3 rounded-lg placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors"
               placeholder="0.00"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2 text-neutral-300">
-              Precio de Venta *
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              value={formData.precio}
-              onChange={(e) =>
-                onFormDataChange({ ...formData, precio: e.target.value })
-              }
-              className="w-full bg-neutral-900 border border-neutral-800 text-neutral-200 p-3 rounded-lg placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-          {/* Mostrar ganancia calculada */}
-          {formData.precio && formData.precio_compra && (
-            <div className="md:col-span-2">
-              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                <p className="text-sm text-green-400">
-                  <span className="font-medium">Ganancia por unidad:</span>{" "}
-                  <span className="font-bold">
-                    ${(parseFloat(formData.precio || "0") - parseFloat(formData.precio_compra || "0")).toFixed(2)}
-                  </span>
-                  {parseFloat(formData.precio_compra || "0") > 0 && (
-                    <span className="text-green-400/70 ml-2">
-                      ({(((parseFloat(formData.precio || "0") - parseFloat(formData.precio_compra || "0")) / parseFloat(formData.precio_compra || "1")) * 100).toFixed(1)}% de margen)
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* Precio venta */}
         <div>
-          <label className="block text-sm font-medium mb-2 text-neutral-300">
+          <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider mb-1">
+            Precio venta *
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={formData.precio}
+            onChange={(e) =>
+              onFormDataChange({ ...formData, precio: e.target.value })
+            }
+            className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors"
+            required
+          />
+        </div>
+
+        {/* Ganancia calculada */}
+        {formData.precio && formData.precio_compra && (
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
+            <p className="text-xs text-emerald-400">
+              <span className="text-emerald-400/70">Ganancia:</span>{" "}
+              <span className="font-semibold">
+                ${(parseFloat(formData.precio || "0") - parseFloat(formData.precio_compra || "0")).toFixed(2)}
+              </span>
+              {parseFloat(formData.precio_compra || "0") > 0 && (
+                <span className="text-emerald-400/60 ml-1.5">
+                  ({(((parseFloat(formData.precio || "0") - parseFloat(formData.precio_compra || "0")) / parseFloat(formData.precio_compra || "1")) * 100).toFixed(0)}%)
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+
+        {/* Descripción */}
+        <div>
+          <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider mb-1">
             Descripción
           </label>
           <textarea
@@ -128,13 +134,15 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
             onChange={(e) =>
               onFormDataChange({ ...formData, descripcion: e.target.value })
             }
-            className="w-full bg-neutral-900 border border-neutral-800 text-neutral-200 p-3 rounded-lg placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
-            rows={3}
-            placeholder="Descripción del producto (opcional)"
+            className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors resize-none"
+            rows={2}
+            placeholder="Opcional"
           />
         </div>
+
+        {/* Notas */}
         <div>
-          <label className="block text-sm font-medium mb-2 text-neutral-300">
+          <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider mb-1">
             Notas
           </label>
           <textarea
@@ -142,24 +150,26 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
             onChange={(e) =>
               onFormDataChange({ ...formData, notas: e.target.value })
             }
-            className="w-full bg-neutral-900 border border-neutral-800 text-neutral-200 p-3 rounded-lg placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
-            rows={3}
-            placeholder="Notas adicionales (opcional)"
+            className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors resize-none"
+            rows={2}
+            placeholder="Opcional"
           />
         </div>
-        <div className="flex gap-3 pt-4">
-          <button
-            type="submit"
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
-          >
-            {isEditing ? "Actualizar" : "Crear Producto"}
-          </button>
+
+        {/* Acciones */}
+        <div className="flex gap-2 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-lg transition-colors"
+            className="px-4 py-2 text-sm text-neutral-400 hover:text-white transition-colors"
           >
             Cancelar
+          </button>
+          <button
+            type="submit"
+            className="flex-1 px-4 py-2 bg-white hover:bg-neutral-200 rounded-lg text-black text-sm font-medium transition-colors"
+          >
+            {isEditing ? "Guardar cambios" : "Crear producto"}
           </button>
         </div>
       </form>

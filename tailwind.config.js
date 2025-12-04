@@ -5,22 +5,22 @@ export default {
     extend: {
       colors: {
         dark: {
-          bg: "#181818",
-          container: "rgba(255, 255, 255, 0.03)",
-          border: "rgba(255, 255, 255, 0.06)",
+          bg: "#0a0a0a",
+          surface: "#111111",
+          container: "#171717",
+          border: "#262626",
+          "border-subtle": "#1a1a1a",
           text: "#ffffff",
-          "text-secondary": "#d1d5db",
-          "text-muted": "#9ca3af",
+          "text-secondary": "#a3a3a3",
+          "text-muted": "#737373",
         },
       },
-      backgroundImage: {
-        glass:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%)",
-        "glass-hover":
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)",
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
-      backdropBlur: {
-        glass: "10px",
+      borderRadius: {
+        'xl': '0.875rem',
+        '2xl': '1rem',
       },
     },
   },

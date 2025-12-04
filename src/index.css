@@ -2,18 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* You can find the original styles in src/styles-old.css */
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Hide scrollbars */
 ::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #404040;
 }
 
 html {
-  scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
   width: 100%;
   overflow-x: hidden;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 body {
@@ -22,6 +37,11 @@ body {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+  background-color: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -48,6 +68,22 @@ main {
 }
 
 .animate-slide-up {
-  animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Subtle fade in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
 }
 

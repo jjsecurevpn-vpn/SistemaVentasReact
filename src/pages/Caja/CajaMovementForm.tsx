@@ -178,139 +178,139 @@ const CajaMovementForm: React.FC<CajaMovementFormProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[11000] bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="min-h-full flex items-start justify-center px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 pt-24 sm:pt-28 md:pt-32 pb-12">
-        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl w-full max-w-5xl xl:max-w-6xl shadow-2xl max-h-[calc(100vh-6rem)] overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-5 sm:p-6 border-b border-neutral-800">
-          <h2 className="text-base sm:text-lg font-semibold text-neutral-200">
-            {movimiento ? 'Editar Movimiento' : 'Nuevo Movimiento'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-neutral-400 hover:text-neutral-200 transition-colors"
-          >
-            <MdClose className="text-xl" />
-          </button>
-        </div>
+    <div className="fixed inset-0 z-[11000] bg-black/60 backdrop-blur-sm overflow-y-auto">
+      <div className="min-h-full flex items-start justify-center p-4 pt-20 pb-8">
+        <div className="bg-neutral-900 border border-neutral-800/50 rounded-2xl w-full max-w-lg">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-neutral-800/50">
+            <h2 className="text-sm font-medium text-white">
+              {movimiento ? 'Editar Movimiento' : 'Nuevo Movimiento'}
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-1 text-neutral-500 hover:text-white transition-colors"
+            >
+              <MdClose size={18} />
+            </button>
+          </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-10rem)]">
-          <div className="grid gap-6 lg:grid-cols-[1.25fr_0.85fr]">
-            <div className="space-y-5">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
-                  Descripción
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-4 space-y-4">
+            {/* Descripción */}
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider">
+                Descripción
+              </label>
+              <textarea
+                name="descripcion"
+                value={formData.descripcion}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 resize-none transition-colors"
+                rows={3}
+                placeholder="Descripción del movimiento..."
+                required
+              />
+            </div>
+
+            {/* Grid 2 columnas */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider">
+                  Tipo
                 </label>
-                <textarea
-                  name="descripcion"
-                  value={formData.descripcion}
+                <select
+                  name="tipo"
+                  value={formData.tipo}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent resize-none"
-                  rows={6}
-                  placeholder="Descripción del movimiento..."
+                  className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm focus:outline-none focus:border-neutral-700 transition-colors"
+                  required
+                >
+                  <option value="ingreso">Ingreso</option>
+                  <option value="gasto">Gasto</option>
+                  <option value="fiado">Fiado</option>
+                  <option value="pago_fiado">Pago Fiado</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider">
+                  Monto
+                </label>
+                <input
+                  type="number"
+                  name="monto"
+                  value={formData.monto}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm focus:outline-none focus:border-neutral-700 transition-colors"
+                  step="0.01"
+                  min="0"
                   required
                 />
               </div>
             </div>
 
-            <div className="space-y-5">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
-                    Tipo
-                  </label>
-                  <select
-                    name="tipo"
-                    value={formData.tipo}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="ingreso">Ingreso</option>
-                    <option value="gasto">Gasto</option>
-                    <option value="fiado">Fiado</option>
-                    <option value="pago_fiado">Pago Fiado</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
-                    Método de Pago
-                  </label>
-                  <select
-                    name="metodo_pago"
-                    value={formData.metodo_pago ?? ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Seleccionar método</option>
-                    <option value="efectivo">Efectivo</option>
-                    <option value="transferencia">Transferencia</option>
-                    <option value="tarjeta">Tarjeta</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
+            {/* Grid 2 columnas */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider">
+                  Método de Pago
+                </label>
+                <select
+                  name="metodo_pago"
+                  value={formData.metodo_pago ?? ''}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm focus:outline-none focus:border-neutral-700 transition-colors"
+                >
+                  <option value="">Seleccionar</option>
+                  <option value="efectivo">Efectivo</option>
+                  <option value="transferencia">Transferencia</option>
+                  <option value="tarjeta">Tarjeta</option>
+                  <option value="otro">Otro</option>
+                </select>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
-                    Monto
-                  </label>
-                  <input
-                    type="number"
-                    name="monto"
-                    value={formData.monto}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                    step="0.01"
-                    min="0"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1">
-                    Usuario Responsable
-                  </label>
-                  <select
-                    name="usuario_id"
-                    value={formData.usuario_id}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 sm:py-2.5 border border-neutral-700 bg-neutral-800 text-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                    required
-                    disabled={loadingUsers}
-                  >
-                    {loadingUsers ? (
-                      <option>Cargando usuarios...</option>
-                    ) : (
-                      availableUsers.map(user => (
-                        <option key={user.id} value={user.id}>
-                          {user.email}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                </div>
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-medium text-neutral-600 uppercase tracking-wider">
+                  Usuario
+                </label>
+                <select
+                  name="usuario_id"
+                  value={formData.usuario_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 bg-neutral-900/60 border border-neutral-800/50 rounded-lg text-white text-sm focus:outline-none focus:border-neutral-700 transition-colors"
+                  required
+                  disabled={loadingUsers}
+                >
+                  {loadingUsers ? (
+                    <option>Cargando...</option>
+                  ) : (
+                    availableUsers.map(user => (
+                      <option key={user.id} value={user.id}>
+                        {user.email}
+                      </option>
+                    ))
+                  )}
+                </select>
               </div>
             </div>
-          </div>
 
-          <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 text-xs sm:text-sm font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-            >
-              {movimiento ? 'Actualizar' : 'Crear'}
-            </button>
-          </div>
-        </form>
+            {/* Acciones */}
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-sm text-neutral-400 hover:text-white transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-white hover:bg-neutral-200 rounded-lg text-black text-sm font-medium transition-colors"
+              >
+                {movimiento ? 'Actualizar' : 'Crear'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

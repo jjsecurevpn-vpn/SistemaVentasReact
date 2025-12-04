@@ -34,81 +34,75 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   onConfirmSale,
   saleLoading,
 }) => (
-  <div className="hidden md:flex md:w-80 lg:w-96 flex-col bg-neutral-900 h-full">
-    <div className="py-3.5 border-b border-neutral-800 flex-shrink-0">
+  <div className="hidden md:flex md:w-80 lg:w-96 flex-col bg-[#0a0a0a] border-l border-neutral-800/50 h-full">
+    {/* Header */}
+    <div className="px-4 py-3 border-b border-neutral-800/50 flex-shrink-0">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-neutral-200 flex items-center gap-2 pl-3">
-          <ShoppingCart size={18} />
-          Carrito
-        </h3>
-        <span className="text-xs text-neutral-400 pr-3">{cart.length}</span>
+        <div className="flex items-center gap-2">
+          <ShoppingCart size={16} className="text-neutral-500" />
+          <span className="text-sm font-medium text-white">Carrito</span>
+        </div>
+        <span className="text-xs text-neutral-600 bg-neutral-800/50 px-2 py-0.5 rounded">{cart.length}</span>
       </div>
     </div>
 
-    <div className="flex-1 overflow-auto min-h-0 max-h-[60vh] p-3">
+    {/* Cart Items */}
+    <div className="flex-1 overflow-auto min-h-0 max-h-[55vh] p-3">
       {cart.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full text-neutral-500">
-          <ShoppingCart className="mb-2 opacity-50" size={40} />
-          <p className="text-sm">Carrito vacío</p>
+        <div className="flex flex-col items-center justify-center h-full text-neutral-600">
+          <ShoppingCart className="mb-2 opacity-30" size={32} />
+          <p className="text-xs">Carrito vacío</p>
         </div>
       ) : (
         <div className="space-y-2">
           {cart.map((item, index) => (
-            <div key={index} className="bg-[#181818] border border-neutral-800 rounded-lg p-2.5">
-              <div className="flex items-start justify-between mb-1.5">
+            <div key={index} className="bg-neutral-900/40 border border-neutral-800/50 rounded-lg p-3">
+              <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0 pr-2">
                   {item.type === "promo" && (
-                    <div className="flex items-center gap-2 text-xs text-emerald-300 mb-0.5">
-                      <span className="px-2 py-0.5 rounded-full border border-emerald-600/40 bg-emerald-600/10">
-                        Promo
-                      </span>
-                    </div>
+                    <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-1">
+                      Promo
+                    </span>
                   )}
-                  <p className="font-medium text-neutral-200 text-sm truncate">
+                  <p className="font-medium text-white text-sm truncate">
                     {item.type === "promo" ? item.promo.nombre : item.product.nombre}
                   </p>
-                  <p className="text-green-400 font-semibold text-base">
-                    ${item.subtotal.toFixed(2)}
-                  </p>
-                  {item.type === "promo" && (
-                    <p className="text-[11px] text-neutral-500 mt-1">
-                        {item.promo.promo_productos
-                          ?.map(
-                            (pp) =>
-                              `×${pp.cantidad * item.quantity} ${pp.producto?.nombre || "Producto"}`
-                        )
-                        .join(" • ") || "Sin detalle"}
-                    </p>
-                  )}
                 </div>
                 <button
                   onClick={() => onRemoveItem(index)}
-                  className="p-1 hover:bg-red-900/30 text-red-400 rounded transition-colors flex-shrink-0"
+                  className="p-1 hover:bg-red-500/10 text-neutral-500 hover:text-red-400 rounded transition-colors flex-shrink-0"
                 >
-                  <X size={16} />
+                  <X size={14} />
                 </button>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-neutral-500">Cantidad:</span>
-                <span className="text-neutral-400">
-                  ×{item.quantity} {item.type === "promo" ? "promo(s)" : "unidad(es)"}
-                </span>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-neutral-500">×{item.quantity}</span>
+                <span className="text-sm font-medium text-emerald-400">${item.subtotal.toFixed(2)}</span>
               </div>
+              {item.type === "promo" && (
+                <p className="text-[10px] text-neutral-600 mt-2 leading-relaxed">
+                  {item.promo.promo_productos
+                    ?.map((pp) => `${pp.cantidad * item.quantity}× ${pp.producto?.nombre || "Producto"}`)
+                    .join(" · ") || "Sin detalle"}
+                </p>
+              )}
             </div>
           ))}
         </div>
       )}
     </div>
 
-    <div className="border-t border-neutral-800 bg-neutral-900 flex-shrink-0 min-h-[120px] sticky bottom-0">
-      <div className="px-3 py-2 border-b border-neutral-800">
+    {/* Footer */}
+    <div className="border-t border-neutral-800/50 bg-[#0a0a0a] flex-shrink-0">
+      {/* Payment Type */}
+      <div className="px-3 py-3 border-b border-neutral-800/30">
         <div className="grid grid-cols-2 gap-2">
           <button
-            onClick={() => {
-              onVentaAlFiadoChange(false);
-            }}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-all ${
-              !ventaAlFiado ? "bg-blue-600 text-white" : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+            onClick={() => onVentaAlFiadoChange(false)}
+            className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${
+              !ventaAlFiado 
+                ? "bg-white text-black" 
+                : "bg-neutral-800/50 text-neutral-500 hover:bg-neutral-800"
             }`}
           >
             <Banknote size={14} />
@@ -116,8 +110,10 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
           </button>
           <button
             onClick={() => onVentaAlFiadoChange(true)}
-            className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-all ${
-              ventaAlFiado ? "bg-yellow-600 text-white" : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+            className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${
+              ventaAlFiado 
+                ? "bg-amber-500 text-black" 
+                : "bg-neutral-800/50 text-neutral-500 hover:bg-neutral-800"
             }`}
           >
             <CreditCard size={14} />
@@ -126,30 +122,32 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
         </div>
       </div>
 
+      {/* Client Selector (for Fiado) */}
       {ventaAlFiado && (
-        <div className="px-3 py-2 border-b border-neutral-800">
-          <label className="block text-xs font-medium text-neutral-400 mb-2">Cliente</label>
+        <div className="px-3 py-3 border-b border-neutral-800/30">
+          <label className="block text-[10px] font-medium text-neutral-500 mb-1.5 uppercase tracking-wider">Cliente</label>
           <button
             onClick={onOpenClienteModal}
-            className="w-full flex items-center justify-between px-2.5 py-2 bg-neutral-800 border border-neutral-700 text-neutral-200 rounded-lg text-xs hover:border-neutral-600 transition-all"
+            className="w-full flex items-center justify-between px-3 py-2 bg-neutral-900/50 border border-neutral-800 text-white rounded-lg text-xs hover:border-neutral-600 transition-all"
           >
-            <span className={clienteSeleccionado ? "text-neutral-200" : "text-neutral-500"}>
+            <span className={clienteSeleccionado ? "text-white" : "text-neutral-500"}>
               {clienteSeleccionado
                 ? `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido || ""}`
                 : "Seleccionar..."}
             </span>
-            <ChevronDown size={14} />
+            <ChevronDown size={14} className="text-neutral-500" />
           </button>
         </div>
       )}
 
+      {/* Payment Method (for Contado) */}
       {!ventaAlFiado && (
-        <div className="px-3 py-2 border-b border-neutral-800">
-          <label className="block text-xs font-medium text-neutral-400 mb-2">Método de pago</label>
+        <div className="px-3 py-3 border-b border-neutral-800/30">
+          <label className="block text-[10px] font-medium text-neutral-500 mb-1.5 uppercase tracking-wider">Método de pago</label>
           <select
             value={metodoPago}
             onChange={(e) => onMetodoPagoChange(e.target.value)}
-            className="w-full px-2.5 py-2 bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-neutral-900/50 border border-neutral-800 text-white text-xs rounded-lg focus:outline-none focus:border-neutral-600 transition-colors"
           >
             <option value="efectivo">Efectivo</option>
             <option value="transferencia">Transferencia</option>
@@ -157,25 +155,27 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
         </div>
       )}
 
-      <div className="px-3 py-2 border-b border-neutral-800">
+      {/* Notes */}
+      <div className="px-3 py-3 border-b border-neutral-800/30">
         <textarea
           value={ventaNotas}
           onChange={(e) => onNotasChange(e.target.value)}
-          placeholder="Comentarios..."
+          placeholder="Notas (opcional)"
           rows={2}
-          className="w-full px-2.5 py-2 bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 bg-neutral-900/50 border border-neutral-800 text-white text-xs rounded-lg resize-none focus:outline-none focus:border-neutral-600 transition-colors placeholder-neutral-600"
         />
       </div>
 
-      <div className="px-3 py-2">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-neutral-400 text-sm font-medium">Total</span>
-          <span className="text-xl font-bold text-green-400">${total.toFixed(2)}</span>
+      {/* Total and Confirm */}
+      <div className="px-3 py-3">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-neutral-500 text-xs font-medium">Total</span>
+          <span className="text-xl font-semibold text-white">${total.toFixed(2)}</span>
         </div>
         <button
           onClick={onConfirmSale}
           disabled={cart.length === 0 || saleLoading}
-          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-neutral-700 disabled:text-neutral-500 text-white py-2.5 rounded-lg font-semibold text-sm transition-colors disabled:cursor-not-allowed"
+          className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:bg-neutral-800 disabled:text-neutral-600 text-black py-2.5 rounded-lg font-medium text-sm transition-colors disabled:cursor-not-allowed"
         >
           {saleLoading ? "Procesando..." : "Confirmar Venta"}
         </button>

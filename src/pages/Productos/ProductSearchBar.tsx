@@ -25,35 +25,35 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
   lowStockCount,
 }) => {
   return (
-    <div className="mb-6 w-full">
+    <div className="mb-4 w-full">
       <div className="relative w-full">
         <Search
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500"
-          size={18} strokeWidth={1.5}
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-600"
+          size={16} strokeWidth={1.5}
         />
         <input
           type="text"
           placeholder="Buscar productos..."
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-12 py-2.5 sm:py-3 bg-neutral-800 border border-neutral-800 text-neutral-200 rounded-lg placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full pl-9 pr-10 py-2.5 bg-neutral-900/60 border border-neutral-800/50 text-white text-sm rounded-xl placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors"
         />
         <button
           onClick={onFilterDropdownToggle}
-          className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors ${
+          className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md transition-colors ${
             stockFilter !== "all"
-              ? "text-blue-400"
-              : "text-neutral-500 hover:text-neutral-300"
+              ? "text-white bg-neutral-700"
+              : "text-neutral-600 hover:text-neutral-400"
           }`}
         >
-          <Filter size={16} />
+          <Filter size={14} />
         </button>
 
         {/* Filter Dropdown */}
         {isFilterDropdownOpen && (
-          <div className="filter-dropdown absolute right-0 top-full mt-1 w-44 sm:w-48 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-50">
-            <div className="p-2">
-              <div className="text-xs font-medium text-neutral-400 uppercase tracking-wide mb-2 px-2">
+          <div className="filter-dropdown absolute right-0 top-full mt-2 w-44 bg-neutral-900 border border-neutral-800/50 rounded-xl shadow-xl overflow-hidden z-50">
+            <div className="p-1.5">
+              <div className="text-[10px] font-medium text-neutral-500 uppercase tracking-wide mb-1 px-2 py-1">
                 Filtrar por stock
               </div>
               <button
@@ -61,10 +61,10 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
                   onStockFilterChange("all");
                   onFilterDropdownToggle();
                 }}
-                className={`w-full text-left px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors ${
                   stockFilter === "all"
-                    ? "bg-blue-600 text-white"
-                    : "text-neutral-300 hover:bg-neutral-700"
+                    ? "bg-white text-black font-medium"
+                    : "text-neutral-400 hover:bg-neutral-800/50"
                 }`}
               >
                 Todos ({totalProducts})
@@ -74,10 +74,10 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
                   onStockFilterChange("in-stock");
                   onFilterDropdownToggle();
                 }}
-                className={`w-full text-left px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors ${
                   stockFilter === "in-stock"
-                    ? "bg-green-600 text-white"
-                    : "text-neutral-300 hover:bg-neutral-700"
+                    ? "bg-emerald-500 text-white font-medium"
+                    : "text-neutral-400 hover:bg-neutral-800/50"
                 }`}
               >
                 Con Stock ({totalProducts - outOfStockCount - lowStockCount})
@@ -87,10 +87,10 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
                   onStockFilterChange("low-stock");
                   onFilterDropdownToggle();
                 }}
-                className={`w-full text-left px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors ${
                   stockFilter === "low-stock"
-                    ? "bg-yellow-600 text-white"
-                    : "text-neutral-300 hover:bg-neutral-700"
+                    ? "bg-amber-500 text-black font-medium"
+                    : "text-neutral-400 hover:bg-neutral-800/50"
                 }`}
               >
                 Stock Bajo ({lowStockCount})
@@ -100,10 +100,10 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
                   onStockFilterChange("out-of-stock");
                   onFilterDropdownToggle();
                 }}
-                className={`w-full text-left px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors ${
                   stockFilter === "out-of-stock"
-                    ? "bg-red-600 text-white"
-                    : "text-neutral-300 hover:bg-neutral-700"
+                    ? "bg-red-500 text-white font-medium"
+                    : "text-neutral-400 hover:bg-neutral-800/50"
                 }`}
               >
                 Sin Stock ({outOfStockCount})

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdMenu, MdPerson } from 'react-icons/md';
+import { MdMenu } from 'react-icons/md';
 import { useAuth } from '../hooks/useAuth';
 
 interface HeaderProps {
@@ -11,34 +11,32 @@ const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   const { user, signOut } = useAuth();
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-neutral-900 text-white text-sm py-3 w-full border-b border-neutral-800 z-[9999] flex items-center justify-between px-4">
-      {/* Left side: Menu button, logo, and title */}
-      <div className="flex items-center gap-4">
+    <header className="fixed top-0 left-0 right-0 h-14 bg-[#0a0a0a] text-white border-b border-neutral-800/50 z-[9999] flex items-center justify-between px-4">
+      {/* Left side: Menu button and logo */}
+      <div className="flex items-center gap-3">
         {onMenuClick && (
           <button
             onClick={onMenuClick}
-            className="md:hidden text-neutral-400 hover:text-neutral-200 transition-colors duration-150"
+            className="md:hidden p-2 -ml-2 text-neutral-400 hover:text-white transition-colors"
           >
-            <MdMenu size={24} />
+            <MdMenu size={20} />
           </button>
         )}
-        {/* Logo Image - Using Secure.svg */}
-        <img src="/Secure.svg" alt="Logo" className="h-8 w-8 flex-shrink-0" />
-        <h1 className="hidden md:inline font-semibold">{title}</h1>
+        <div className="flex items-center gap-3">
+          <img src="/Secure.svg" alt="Logo" className="h-7 w-7" />
+          <span className="hidden md:inline text-sm font-medium text-white">{title}</span>
+        </div>
       </div>
 
       {/* Right side: User info */}
       {user && (
-        <div className="flex items-center gap-3 text-neutral-300">
-          {/* Desktop: show email */}
-          <span className="hidden md:inline text-sm">{user.email}</span>
-          {/* Mobile: show user icon */}
-          <MdPerson className="hidden" size={20} />
+        <div className="flex items-center gap-4">
+          <span className="hidden sm:inline text-xs text-neutral-500">{user.email}</span>
           <button
             onClick={signOut}
-            className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors duration-150"
+            className="text-xs text-neutral-500 hover:text-white transition-colors px-3 py-1.5 hover:bg-neutral-800/50 rounded-md"
           >
-            Cerrar sesión
+            Salir
           </button>
         </div>
       )}
