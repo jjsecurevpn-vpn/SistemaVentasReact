@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, Users, ShoppingCart, TrendingUp, Coins, ChevronLeft, ChevronRight, Calendar, Loader2 } from 'lucide-react';
+import { Package, Users, ShoppingCart, TrendingUp, Coins, ChevronLeft, ChevronRight, Calendar, Loader2, Info } from 'lucide-react';
 import type { DashboardStats } from '../../hooks/useDashboard';
 import { getTodayString } from '../../hooks/useDateUtils';
 
@@ -13,9 +13,10 @@ interface StatsCardsProps {
   fechaDia: string;
   onFechaDiaChange: (fecha: string) => void;
   loadingUpdate?: boolean;
+  onShowDayDetails?: () => void;
 }
 
-const StatsCards: React.FC<StatsCardsProps> = ({ stats, formatCurrency, meses, mes, año, ultimoDiaMes, fechaDia, onFechaDiaChange, loadingUpdate = false }) => {
+const StatsCards: React.FC<StatsCardsProps> = ({ stats, formatCurrency, meses, mes, año, ultimoDiaMes, fechaDia, onFechaDiaChange, loadingUpdate = false, onShowDayDetails }) => {
   const hoy = getTodayString();
   const esHoy = fechaDia === hoy;
   
@@ -82,7 +83,8 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats, formatCurrency, meses, m
       icon: ShoppingCart,
       format: 'currency',
       highlight: true,
-      hasDateSelector: true
+      hasDateSelector: true,
+      showDetailsButton: true
     },
     {
       label: `Ganancia ${labelDia}`,
@@ -90,7 +92,8 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats, formatCurrency, meses, m
       icon: Coins,
       format: 'currency',
       accent: 'emerald',
-      hasDateSelector: true
+      hasDateSelector: true,
+      showDetailsButton: true
     },
     {
       label: `Ventas ${meses[mes - 1]}`,
@@ -189,9 +192,18 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats, formatCurrency, meses, m
                   `} 
                   strokeWidth={1.5} 
                 />
-                <span className="text-xs text-neutral-500 font-medium">{item.label}</span>
+                <span className="text-xs text-neutral-500 font-medium truncate flex-1">{item.label}</span>
                 {showLoading && (
-                  <Loader2 size={12} className="animate-spin text-neutral-500 ml-auto" />
+                  <Loader2 size={12} className="animate-spin text-neutral-500" />
+                )}
+                {item.showDetailsButton && onShowDayDetails && !showLoading && (
+                  <button
+                    onClick={onShowDayDetails}
+                    className="p-1 rounded-md text-neutral-500 hover:text-white hover:bg-neutral-700/50 transition-all"
+                    title="Ver detalles"
+                  >
+                    <Info size={14} />
+                  </button>
                 )}
               </div>
               <p className={`

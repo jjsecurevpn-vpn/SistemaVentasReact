@@ -191,30 +191,84 @@ const ClienteDetails: React.FC<ClienteDetailsProps> = ({
                     <p className="text-neutral-500 text-sm">Sin pagos registrados</p>
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {pagos.map((pago) => (
                       <div
                         key={pago.id}
-                        className="bg-neutral-900/40 border border-neutral-800/50 rounded-xl p-4 flex justify-between items-center"
+                        className="bg-neutral-900/40 border border-neutral-800/50 rounded-xl p-4"
                       >
-                        <div>
+                        <div className="flex justify-between items-start mb-3">
                           <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 text-xs">✓</span>
+                            <span className="w-7 h-7 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 text-sm">✓</span>
                             <div>
-                              <p className="text-sm text-white">Pago #{pago.id}</p>
+                              <p className="text-sm font-medium text-white">Pago #{pago.id}</p>
                               <p className="text-[10px] text-neutral-600">
                                 {formatDate(pago.fecha_pago)}
-                                {pago.metodo_pago && ` • ${pago.metodo_pago}`}
                               </p>
                             </div>
                           </div>
+                          <p className="text-lg font-semibold text-emerald-400">
+                            {formatCurrency(pago.monto)}
+                          </p>
+                        </div>
+                        
+                        {/* Detalles del pago */}
+                        <div className="ml-9 space-y-2">
+                          {pago.ventas_fiadas?.venta && (
+                            <div className="bg-neutral-800/30 rounded-lg p-3">
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Venta asociada</p>
+                                  <p className="text-xs text-neutral-300 mt-0.5">
+                                    Venta #{pago.ventas_fiadas.venta.id}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-[10px] text-neutral-500">Total venta</p>
+                                  <p className="text-xs text-neutral-300">
+                                    {formatCurrency(pago.ventas_fiadas.venta.total)}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              {/* Productos de la venta */}
+                              {pago.ventas_fiadas.venta.venta_productos && pago.ventas_fiadas.venta.venta_productos.length > 0 && (
+                                <div className="border-t border-neutral-700/50 pt-2 mt-2">
+                                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide mb-1.5">Productos</p>
+                                  <div className="space-y-1">
+                                    {pago.ventas_fiadas.venta.venta_productos.map((vp, idx) => (
+                                      <div key={idx} className="flex justify-between items-center text-xs">
+                                        <span className="text-neutral-400">
+                                          {vp.productos.nombre} <span className="text-neutral-600">×{vp.cantidad}</span>
+                                        </span>
+                                        <span className="text-neutral-500">
+                                          {formatCurrency(vp.subtotal)}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          <div className="flex flex-wrap gap-2">
+                            {pago.metodo_pago && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-neutral-800/50 rounded-md text-[10px] text-neutral-400">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                                {pago.metodo_pago}
+                              </span>
+                            )}
+                          </div>
+                          
                           {pago.notas && (
-                            <p className="text-[10px] text-neutral-600 italic mt-1 ml-8">{pago.notas}</p>
+                            <p className="text-[10px] text-neutral-600 italic pt-2 border-t border-neutral-800/30">
+                              {pago.notas}
+                            </p>
                           )}
                         </div>
-                        <p className="text-lg font-semibold text-emerald-400">
-                          {formatCurrency(pago.monto)}
-                        </p>
                       </div>
                     ))}
                   </div>

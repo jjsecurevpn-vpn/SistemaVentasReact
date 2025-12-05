@@ -35,12 +35,35 @@ export interface ClienteTop {
   total_comprado: number;
 }
 
+export interface DetalleVentaDia {
+  id: number;
+  nombre: string;
+  cantidad: number;
+  precio_unitario: number;
+  precio_compra: number;
+  subtotal: number;
+  costo_total: number;
+  ganancia: number;
+  sinPrecioCosto?: boolean;
+}
+
+export interface DetallesDelDia {
+  productos: DetalleVentaDia[];
+  total_ventas: number;
+  total_ventas_con_costo: number; // Solo ventas de productos que tienen precio de compra
+  total_costo: number;
+  total_ganancia: number;
+  cantidad_productos_vendidos: number;
+  cantidad_ventas: number;
+}
+
 export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [productosVendidos, setProductosVendidos] = useState<ProductoVendido[]>(
     []
   );
   const [clientesTop, setClientesTop] = useState<ClienteTop[]>([]);
+  const [detallesDelDia, setDetallesDelDia] = useState<DetallesDelDia | null>(null);
   const [loadingInicial, setLoadingInicial] = useState(true);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -172,32 +195,40 @@ export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => 
             const producto = Array.isArray(item.productos) ? item.productos[0] : item.productos;
             
             // Usar precios históricos de venta_productos, fallback a precios actuales del producto
-            const precioVentaHistorico = item.precio_unitario ?? producto?.precio ?? 0;
-            const precioCompraHistorico = item.precio_compra ?? producto?.precio_compra ?? 0;
+            const precioVentaHistorico = item.precio_unitario || producto?.precio || 0;
+            // Para precio de compra: intentar histórico, luego actual del producto
+            const precioCompraItem = item.precio_compra || producto?.precio_compra || 0;
+            // Si no hay precio de compra, no podemos calcular ganancia para este item
+            const tienePrecionCompra = precioCompraItem > 0;
             
             if (!productosMap.has(productoId)) {
               productosMap.set(productoId, {
                 cantidad: 0,
                 subtotal: 0,
-                costoTotal: 0, // Acumular costo usando precios históricos
+                costoTotal: 0,
+                subtotalConCosto: 0, // Solo subtotal de items que tienen precio de compra
                 nombre: producto?.nombre,
                 precio: precioVentaHistorico,
-                precio_compra: precioCompraHistorico
+                precio_compra: precioCompraItem
               });
             }
             const current = productosMap.get(productoId);
             current.cantidad += item.cantidad || 0;
             current.subtotal += item.subtotal || 0;
-            // Calcular costo usando el precio_compra histórico de cada venta
-            current.costoTotal += (precioCompraHistorico * (item.cantidad || 0));
+            // Solo sumar al costo y subtotalConCosto si tiene precio de compra
+            if (tienePrecionCompra) {
+              current.costoTotal += (precioCompraItem * (item.cantidad || 0));
+              current.subtotalConCosto += item.subtotal || 0;
+            }
         }
         }
 
         // Convertir a array y calcular ganancia usando costoTotal acumulado (precios históricos)
         productosVendidosFinal = Array.from(productosMap.entries())
           .map(([id, data]) => {
-            // Ganancia = ingresos - costo total (usando precios históricos)
-            const gananciaProducto = data.subtotal - data.costoTotal;
+            // Ganancia = solo de items con precio de compra (subtotalConCosto - costoTotal)
+            // Si no tiene precio de compra, ganancia = 0
+            const gananciaProducto = data.subtotalConCosto - data.costoTotal;
             return {
               id,
               nombre: data.nombre,
@@ -211,31 +242,105 @@ export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => 
           .sort((a, b) => b.total_vendido - a.total_vendido)
           .slice(0, 10);
 
-        // Calcular ganancia total del mes usando costos históricos acumulados
+        // Calcular ganancia total del mes: solo de items con precio de compra
         gananciaMes = Array.from(productosMap.values()).reduce((sum, data) => {
-          return sum + (data.subtotal - data.costoTotal);
+          return sum + (data.subtotalConCosto - data.costoTotal);
         }, 0);
       }
 
       // Calcular ganancia del día seleccionado (solo de ventas PAGADAS ese día)
       let gananciaDia = 0;
       const ventasIdsDia = movimientosIngresoDia.map(m => m.venta_id);
+      let detallesDelDiaFinal: DetallesDelDia = {
+        productos: [],
+        total_ventas: 0,
+        total_ventas_con_costo: 0,
+        total_costo: 0,
+        total_ganancia: 0,
+        cantidad_productos_vendidos: 0,
+        cantidad_ventas: ventasIdsDia.length,
+      };
       
       if (ventasIdsDia.length > 0) {
         // Usar precios históricos de venta_productos para ganancia del día
         const { data: productosDiaData } = await supabase
           .from("venta_productos")
-          .select("cantidad, subtotal, precio_compra, productos(precio_compra)")
+          .select("producto_id, cantidad, subtotal, precio_unitario, precio_compra, productos(id, nombre, precio, precio_compra)")
           .in("venta_id", ventasIdsDia);
 
         if (productosDiaData) {
-          gananciaDia = productosDiaData.reduce((sum, item) => {
+          // Agrupar productos del día para mostrar detalles
+          const productosDiaMap = new Map<number, any>();
+          
+          for (const item of productosDiaData) {
+            const productoId = item.producto_id;
             const producto = Array.isArray(item.productos) ? item.productos[0] : item.productos;
-            // Usar precio_compra histórico de venta_productos, fallback al precio actual
-            const precioCompra = item.precio_compra ?? producto?.precio_compra ?? 0;
-            const costoItem = precioCompra * (item.cantidad || 0);
-            return sum + ((item.subtotal || 0) - costoItem);
-          }, 0);
+            
+            // Usar precios históricos de venta_productos, fallback a precios actuales del producto
+            const precioVentaHistorico = item.precio_unitario || producto?.precio || 0;
+            // Para precio de compra: intentar histórico, luego actual del producto
+            const precioCompraItem = item.precio_compra || producto?.precio_compra || 0;
+            // Si no hay precio de compra, no podemos calcular ganancia para este item
+            const tienePrecionCompra = precioCompraItem > 0;
+            
+            if (!productosDiaMap.has(productoId)) {
+              productosDiaMap.set(productoId, {
+                cantidad: 0,
+                subtotal: 0,
+                costoTotal: 0,
+                subtotalConCosto: 0, // Solo subtotal de items que tienen precio de compra
+                nombre: producto?.nombre || 'Producto eliminado',
+                precio_unitario: precioVentaHistorico,
+                precio_compra: precioCompraItem,
+                sinPrecioCosto: false // Flag para indicar si algún item no tiene precio de compra
+              });
+            }
+            const current = productosDiaMap.get(productoId);
+            current.cantidad += item.cantidad || 0;
+            current.subtotal += item.subtotal || 0;
+            // Solo sumar al costo y subtotalConCosto si tiene precio de compra
+            if (tienePrecionCompra) {
+              current.costoTotal += (precioCompraItem * (item.cantidad || 0));
+              current.subtotalConCosto += item.subtotal || 0;
+            } else {
+              current.sinPrecioCosto = true;
+            }
+          }
+
+          // Convertir a array de detalles
+          const productosDetalles: DetalleVentaDia[] = Array.from(productosDiaMap.entries())
+            .map(([id, data]) => ({
+              id,
+              nombre: data.nombre,
+              cantidad: data.cantidad,
+              precio_unitario: data.precio_unitario,
+              precio_compra: data.precio_compra,
+              subtotal: data.subtotal,
+              costo_total: data.costoTotal,
+              // Ganancia = solo de items con precio de compra (subtotalConCosto - costoTotal)
+              ganancia: data.subtotalConCosto - data.costoTotal,
+              sinPrecioCosto: data.sinPrecioCosto,
+            }))
+            .sort((a, b) => b.ganancia - a.ganancia);
+
+          gananciaDia = productosDetalles.reduce((sum, p) => sum + p.ganancia, 0);
+          const totalVentas = productosDetalles.reduce((sum, p) => sum + p.subtotal, 0);
+          // Ventas solo de productos con costo (para mostrar la fórmula correcta)
+          const totalVentasConCosto = productosDetalles
+            .filter(p => !p.sinPrecioCosto)
+            .reduce((sum, p) => sum + p.subtotal, 0);
+          const totalCosto = productosDetalles.reduce((sum, p) => sum + p.costo_total, 0);
+          const cantidadProductos = productosDetalles.reduce((sum, p) => sum + p.cantidad, 0);
+
+          detallesDelDiaFinal = {
+            productos: productosDetalles,
+            total_ventas: totalVentas,
+            total_ventas_con_costo: totalVentasConCosto,
+            total_costo: totalCosto,
+            total_ganancia: gananciaDia,
+            cantidad_productos_vendidos: cantidadProductos,
+            cantidad_ventas: ventasIdsDia.length,
+          };
         }
       }
 
@@ -305,6 +410,7 @@ export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => 
       });
       setProductosVendidos(productosVendidosFinal);
       setClientesTop(clientesTopFinal);
+      setDetallesDelDia(detallesDelDiaFinal);
       setHasFetchedOnce(true);
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
@@ -345,6 +451,7 @@ export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => 
     stats,
     productosVendidos,
     clientesTop,
+    detallesDelDia,
     loading: loadingInicial,
     loadingUpdate,
     error,

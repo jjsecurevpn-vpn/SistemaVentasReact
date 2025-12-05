@@ -46,6 +46,19 @@ export interface PagoFiado {
   fecha_pago: string;
   metodo_pago?: string;
   notas?: string;
+  ventas_fiadas?: {
+    cliente_id: number;
+    venta?: {
+      id: number;
+      fecha: string;
+      total: number;
+      venta_productos?: Array<{
+        cantidad: number;
+        subtotal: number;
+        productos: { nombre: string };
+      }>;
+    } | null;
+  };
 }
 
 type ClienteConVentas = Cliente & {
@@ -253,7 +266,14 @@ export const useClientes = () => {
             venta:ventas (
               id,
               fecha,
-              total
+              total,
+              venta_productos (
+                cantidad,
+                subtotal,
+                productos (
+                  nombre
+                )
+              )
             )
           )
         `

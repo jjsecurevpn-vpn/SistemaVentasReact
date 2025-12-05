@@ -8,6 +8,7 @@ import StatsCards from './StatsCards';
 import FinancialStats from './FinancialStats';
 import TopProducts from './TopProducts';
 import TopClients from './TopClients';
+import DayDetailsModal from './DayDetailsModal';
 import { getTodayString } from '../../hooks/useDateUtils';
 
 const Dashboard: React.FC = () => {
@@ -15,11 +16,13 @@ const Dashboard: React.FC = () => {
   const [mes, setMes] = useState<number>(new Date().getMonth() + 1);
   const [año, setAño] = useState<number>(new Date().getFullYear());
   const [fechaDia, setFechaDia] = useState<string>(getTodayString());
+  const [showDayDetailsModal, setShowDayDetailsModal] = useState(false);
 
   const {
     stats,
     productosVendidos,
     clientesTop,
+    detallesDelDia,
     loading,
     loadingUpdate,
     error
@@ -126,6 +129,15 @@ const Dashboard: React.FC = () => {
   const isCurrentMonth = mes === new Date().getMonth() + 1 && año === new Date().getFullYear();
   const ultimoDiaMes = new Date(año, mes, 0).getDate();
 
+  // Formatear fecha para mostrar en el modal
+  const formatearFechaModal = (fechaStr: string): string => {
+    const [year, month, day] = fechaStr.split('-').map(Number);
+    const fecha = new Date(year, month - 1, day);
+    const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return `${diasSemana[fecha.getDay()]} ${day} de ${mesesNombres[month - 1]} ${year}`;
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] overflow-x-hidden w-full">
       <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 max-w-7xl mx-auto w-full">
@@ -151,6 +163,7 @@ const Dashboard: React.FC = () => {
           fechaDia={fechaDia}
           onFechaDiaChange={setFechaDia}
           loadingUpdate={loadingUpdate}
+          onShowDayDetails={() => setShowDayDetailsModal(true)}
         />
 
         <FinancialStats stats={stats} formatCurrency={formatCurrency} />
@@ -172,6 +185,15 @@ const Dashboard: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Modal de detalles del día */}
+      <DayDetailsModal
+        isOpen={showDayDetailsModal}
+        onClose={() => setShowDayDetailsModal(false)}
+        detalles={detallesDelDia}
+        fechaLabel={formatearFechaModal(fechaDia)}
+        formatCurrency={formatCurrency}
+      />
     </div>
   );
 };
