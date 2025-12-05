@@ -319,13 +319,6 @@ export const useClientes = () => {
         }
 
         const clienteId = ventasFiadas[0]?.cliente_id ?? null;
-        const totalPago = pagos.reduce((sum, p) => sum + p.monto, 0);
-        const descripcion =
-          pagos.length === 1
-            ? `Pago de deuda #${pagos[0].ventaFiadaId}`
-            : `Pago de deudas ${pagos
-                .map((p) => `#${p.ventaFiadaId}`)
-                .join(", ")}`;
 
         const detallePago = pagos
           .map(
@@ -341,20 +334,26 @@ export const useClientes = () => {
           .filter(Boolean)
           .join(" | ");
 
+        // Crear un movimiento por cada venta pagada para poder calcular ganancias correctamente
+        // Cada movimiento incluye el venta_id correspondiente
+        const movimientosAInsertar = pagos.map((pago) => {
+          const ventaFiada = ventasFiadas.find((vf) => vf.id === pago.ventaFiadaId);
+          return {
+            tipo: "pago_fiado",
+            descripcion: `Pago de deuda #${pago.ventaFiadaId}`,
+            monto: pago.monto,
+            categoria: "pagos_fiados",
+            notas: notasMovimiento || null,
+            cliente_id: clienteId,
+            usuario_id: user?.id,
+            metodo_pago: metodoPago,
+            venta_id: ventaFiada?.venta_id || null,
+          };
+        });
+
         const { error: movimientoError } = await supabase
           .from("movimientos_caja")
-          .insert([
-            {
-              tipo: "pago_fiado",
-              descripcion,
-              monto: totalPago,
-              categoria: "pagos_fiados",
-              notas: notasMovimiento || null,
-              cliente_id: clienteId,
-              usuario_id: user?.id,
-              metodo_pago: metodoPago,
-            },
-          ]);
+          .insert(movimientosAInsertar);
 
         if (movimientoError) throw movimientoError;
 

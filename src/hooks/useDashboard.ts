@@ -138,11 +138,12 @@ export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => 
       }, 0);
 
       // Obtener IDs de ventas pagadas del mes (filtrado por fecha local)
+      // Incluir tanto ventas directas (ingreso) como pagos de ventas fiadas (pago_fiado)
       const movimientosIngresoMes = movimientosDelMes
-        .filter(m => m.tipo === 'ingreso' && m.venta_id);
+        .filter(m => (m.tipo === 'ingreso' || m.tipo === 'pago_fiado') && m.venta_id);
       
       const movimientosIngresoDia = movimientosDelDia
-        .filter(m => m.tipo === 'ingreso' && m.venta_id);
+        .filter(m => (m.tipo === 'ingreso' || m.tipo === 'pago_fiado') && m.venta_id);
 
       // Procesar productos más vendidos si hay ventas PAGADAS en el mes
       // Solo contamos ventas que impactaron la caja (tipo 'ingreso')
