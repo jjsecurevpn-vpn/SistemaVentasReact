@@ -253,7 +253,7 @@ export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => 
       const ventasIdsDia = movimientosIngresoDia.map(m => m.venta_id);
       let detallesDelDiaFinal: DetallesDelDia = {
         productos: [],
-        total_ventas: 0,
+        total_ventas: ventasDiaMonto, // Usar el monto real de caja, no los subtotales de productos
         total_ventas_con_costo: 0,
         total_costo: 0,
         total_ganancia: 0,
@@ -324,7 +324,6 @@ export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => 
             .sort((a, b) => b.ganancia - a.ganancia);
 
           gananciaDia = productosDetalles.reduce((sum, p) => sum + p.ganancia, 0);
-          const totalVentas = productosDetalles.reduce((sum, p) => sum + p.subtotal, 0);
           // Ventas solo de productos con costo (para mostrar la fórmula correcta)
           const totalVentasConCosto = productosDetalles
             .filter(p => !p.sinPrecioCosto)
@@ -334,7 +333,7 @@ export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => 
 
           detallesDelDiaFinal = {
             productos: productosDetalles,
-            total_ventas: totalVentas,
+            total_ventas: ventasDiaMonto, // Usar el monto real de caja para consistencia con dashboard
             total_ventas_con_costo: totalVentasConCosto,
             total_costo: totalCosto,
             total_ganancia: gananciaDia,
