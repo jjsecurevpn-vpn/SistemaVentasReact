@@ -8,19 +8,22 @@ import StatsCards from './StatsCards';
 import FinancialStats from './FinancialStats';
 import TopProducts from './TopProducts';
 import TopClients from './TopClients';
+import { getTodayString } from '../../hooks/useDateUtils';
 
 const Dashboard: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [mes, setMes] = useState<number>(new Date().getMonth() + 1);
   const [año, setAño] = useState<number>(new Date().getFullYear());
+  const [fechaDia, setFechaDia] = useState<string>(getTodayString());
 
   const {
     stats,
     productosVendidos,
     clientesTop,
     loading,
+    loadingUpdate,
     error
-  } = useDashboard(mes, año);
+  } = useDashboard(mes, año, fechaDia);
 
   // Actualizar la hora cada segundo
   useEffect(() => {
@@ -30,6 +33,24 @@ const Dashboard: React.FC = () => {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Sincronizar el día seleccionado cuando cambia el mes/año
+  useEffect(() => {
+    const hoy = new Date();
+    const mesActual = hoy.getMonth() + 1;
+    const añoActual = hoy.getFullYear();
+    
+    // Si es el mes actual, ir al día de hoy
+    if (mes === mesActual && año === añoActual) {
+      setFechaDia(getTodayString());
+    } else {
+      // Si es un mes pasado, ir al último día del mes
+      // Si es un mes futuro (no debería pasar), ir al primer día
+      const ultimoDia = new Date(año, mes, 0).getDate();
+      const nuevaFecha = `${año}-${String(mes).padStart(2, '0')}-${String(ultimoDia).padStart(2, '0')}`;
+      setFechaDia(nuevaFecha);
+    }
+  }, [mes, año]);
 
   // Corregir precio del producto Demo al cargar el dashboard
   useEffect(() => {
@@ -125,7 +146,11 @@ const Dashboard: React.FC = () => {
           formatCurrency={formatCurrency}
           meses={meses}
           mes={mes}
+          año={año}
           ultimoDiaMes={ultimoDiaMes}
+          fechaDia={fechaDia}
+          onFechaDiaChange={setFechaDia}
+          loadingUpdate={loadingUpdate}
         />
 
         <FinancialStats stats={stats} formatCurrency={formatCurrency} />

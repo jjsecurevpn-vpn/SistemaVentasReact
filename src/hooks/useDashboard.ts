@@ -35,18 +35,25 @@ export interface ClienteTop {
   total_comprado: number;
 }
 
-export const useDashboard = (mes?: number, año?: number) => {
+export const useDashboard = (mes?: number, año?: number, fechaDia?: string) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [productosVendidos, setProductosVendidos] = useState<ProductoVendido[]>(
     []
   );
   const [clientesTop, setClientesTop] = useState<ClienteTop[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingInicial, setLoadingInicial] = useState(true);
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasFetchedOnce, setHasFetchedOnce] = useState(false);
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      setLoading(true);
+      // Solo mostrar loading inicial si es la primera carga
+      if (!hasFetchedOnce) {
+        setLoadingInicial(true);
+      } else {
+        setLoadingUpdate(true);
+      }
       setError(null);
 
       const now = new Date();
@@ -55,7 +62,8 @@ export const useDashboard = (mes?: number, año?: number) => {
 
       // Usar hook centralizado para manejo de fechas
       const { start: fechaInicioISO, end: fechaFinISO } = getMonthRange(añoActual, mesActual);
-      const hoyISO = getTodayString();
+      // Usar fecha seleccionada o hoy por defecto
+      const diaSeleccionadoISO = fechaDia || getTodayString();
 
       // Ejecutar todas las queries principales en paralelo
       // NOTA: Traemos todos los movimientos y filtramos en cliente para manejar correctamente timezone
@@ -92,9 +100,9 @@ export const useDashboard = (mes?: number, año?: number) => {
         return fechaLocal >= fechaInicioISO && fechaLocal <= fechaFinISO;
       });
 
-      const movimientosDeHoy = (todosMovimientos || []).filter(m => {
+      const movimientosDelDia = (todosMovimientos || []).filter(m => {
         const fechaLocal = getLocalDateString(m.fecha);
-        return fechaLocal === hoyISO;
+        return fechaLocal === diaSeleccionadoISO;
       });
 
       // Calcular ingresos, gastos y ventas del mes
@@ -106,8 +114,8 @@ export const useDashboard = (mes?: number, año?: number) => {
         .filter(m => m.tipo === 'gasto')
         .reduce((sum, m) => sum + (m.monto || 0), 0);
 
-      // Ventas hoy (monto en caja)
-      const ventasHoyMonto = movimientosDeHoy
+      // Ventas del día seleccionado (monto en caja)
+      const ventasDiaMonto = movimientosDelDia
         .filter(m => m.tipo === 'ingreso' || m.tipo === 'pago_fiado')
         .reduce((sum, m) => sum + (m.monto || 0), 0);
 
@@ -133,7 +141,7 @@ export const useDashboard = (mes?: number, año?: number) => {
       const movimientosIngresoMes = movimientosDelMes
         .filter(m => m.tipo === 'ingreso' && m.venta_id);
       
-      const movimientosIngresoHoy = movimientosDeHoy
+      const movimientosIngresoDia = movimientosDelDia
         .filter(m => m.tipo === 'ingreso' && m.venta_id);
 
       // Procesar productos más vendidos si hay ventas PAGADAS en el mes
@@ -208,19 +216,19 @@ export const useDashboard = (mes?: number, año?: number) => {
         }, 0);
       }
 
-      // Calcular ganancia de hoy (solo de ventas PAGADAS hoy)
-      let gananciaHoy = 0;
-      const ventasIdsHoy = movimientosIngresoHoy.map(m => m.venta_id);
+      // Calcular ganancia del día seleccionado (solo de ventas PAGADAS ese día)
+      let gananciaDia = 0;
+      const ventasIdsDia = movimientosIngresoDia.map(m => m.venta_id);
       
-      if (ventasIdsHoy.length > 0) {
+      if (ventasIdsDia.length > 0) {
         // Usar precios históricos de venta_productos para ganancia del día
-        const { data: productosHoyData } = await supabase
+        const { data: productosDiaData } = await supabase
           .from("venta_productos")
           .select("cantidad, subtotal, precio_compra, productos(precio_compra)")
-          .in("venta_id", ventasIdsHoy);
+          .in("venta_id", ventasIdsDia);
 
-        if (productosHoyData) {
-          gananciaHoy = productosHoyData.reduce((sum, item) => {
+        if (productosDiaData) {
+          gananciaDia = productosDiaData.reduce((sum, item) => {
             const producto = Array.isArray(item.productos) ? item.productos[0] : item.productos;
             // Usar precio_compra histórico de venta_productos, fallback al precio actual
             const precioCompra = item.precio_compra ?? producto?.precio_compra ?? 0;
@@ -285,17 +293,18 @@ export const useDashboard = (mes?: number, año?: number) => {
       setStats({
         total_productos: productosData?.length || 0,
         total_clientes: clientesData?.length || 0,
-        ventas_hoy: ventasHoyMonto,
+        ventas_hoy: ventasDiaMonto,
         ventas_mes: ingresosMes,
         ingresos_mes: ingresosMes,
         gastos_mes: gastosMes,
         dinero_fiado_pendiente: dineroFiadoPendiente,
         dinero_disponible: dineroDisponibleTotal,
-        ganancia_hoy: gananciaHoy,
+        ganancia_hoy: gananciaDia,
         ganancia_mes: gananciaMes,
       });
       setProductosVendidos(productosVendidosFinal);
       setClientesTop(clientesTopFinal);
+      setHasFetchedOnce(true);
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       setError(
@@ -304,9 +313,10 @@ export const useDashboard = (mes?: number, año?: number) => {
           : "Error al cargar datos del dashboard"
       );
     } finally {
-      setLoading(false);
+      setLoadingInicial(false);
+      setLoadingUpdate(false);
     }
-  }, [mes, año]);
+  }, [mes, año, fechaDia, hasFetchedOnce]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -334,7 +344,8 @@ export const useDashboard = (mes?: number, año?: number) => {
     stats,
     productosVendidos,
     clientesTop,
-    loading,
+    loading: loadingInicial,
+    loadingUpdate,
     error,
     refetch: fetchDashboardData,
   };
